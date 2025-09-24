@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot - Áreas Protegidas de Belice</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1e88e5;
+            --primary-dark: #1565c0;
+            --primary-light: #64b5f6;
+            --secondary-color: #43a047;
+            --accent-color: #ff7043;
+            --background: #f5f7fa;
+            --surface: #ffffff;
+            --text-primary: #212121;
+            --text-secondary: #757575;
+            --divider: #e0e0e0;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 5px 15px rgba(0, 0, 0, 0.2);
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+            max-height: 700px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-color), var(--secondary-color));
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background-color: var(--background);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 5px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            justify-content: flex-end;
+        }
+
+        .bot-message {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 75%;
+            padding: 14px 18px;
+            border-radius: 18px;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .user-message .message-content {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot-message .message-content {
+            background-color: var(--surface);
+            color: var(--text-primary);
+            border: 1px solid var(--divider);
+            border-bottom-left-radius: 4px;
+        }
+
+        .input-container {
+            display: flex;
+            padding: 15px;
+            background-color: var(--surface);
+            border-top: 1px solid var(--divider);
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 1px solid var(--divider);
+            border-radius: 30px;
+            outline: none;
+            font-size: 15px;
+            transition: border 0.3s;
+        }
+
+        #user-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        #send-button {
+            margin-left: 12px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 46px;
+            height: 46px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #send-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #send-button:active {
+            transform: scale(0.98);
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 8px 15px;
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 14px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .typing-indicator.active {
+            display: block;
+        }
+
+        .bot-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-color), #2e7d32);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-color), #e64a19);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
+
+        .message-wrapper {
+            display: flex;
+            align-items: flex-end;
+            max-width: 85%;
+        }
+
+        .bot-message .message-wrapper {
+            flex-direction: row;
+        }
+
+        .user-message .message-wrapper {
+            flex-direction: row-reverse;
+            margin-left: auto;
+        }
+
+        .timestamp {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .bot-message .timestamp {
+            text-align: left;
+        }
+
+        .footer {
+            padding: 10px 15px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+            background-color: var(--surface);
+            border-top: 1px solid var(--divider);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                height: 90vh;
+                max-height: none;
+                border-radius: 0;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+        }
+
+        /* Scrollbar styling */
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-container::-webkit-scrollbar-track {
+            background: var(--background);
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background-color: var(--primary-light);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Asistente de Áreas Protegidas de Belice</h1>
+            <p>Consulta información sobre restricciones, geoprocesos y regulaciones ambientales</p>
+        </div>
+        <div class="chat-container" id="chat-container">
+            <div class="message bot-message">
+                <div class="message-wrapper">
+                    <div class="bot-avatar">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <div>
+                        <div class="message-content">
+                            ¡Hola! Soy tu asistente especializado en áreas protegidas de Belice. Puedes preguntarme sobre restricciones, geoprocesos o cualquier aspecto relacionado con los datos disponibles. ¿En qué puedo ayudarte hoy?
+                        </div>
+                        <div class="timestamp">Hoy, 10:30 AM</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="typing-indicator" id="typing-indicator">
+            <i class="fas fa-robot"></i> Escribiendo respuesta...
+        </div>
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Escribe tu pregunta aquí..." />
+            <button id="send-button">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+        <div class="footer">
+            Asistente de Consultas - Áreas Protegidas de Belice © 2023
+        </div>
+    </div>
+    <script src="db.json"></script>
+    <script>
+        // Base de datos de áreas protegidas en Belice
+        
+        // Configuración de la API de Gemini
+        const apiKey = 'AIzaSyDLzplCcOl_xbZWghCnwCP9Qmw7cE_eg6o';
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+
+        // Historial de la conversación
+        let historialConversacion = [];
+
+        // Elementos del DOM
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const typingIndicator = document.getElementById('typing-indicator');
+
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Función para enviar mensajes
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (message === '') return;
+
+            // Agregar mensaje del usuario al chat
+            addMessageToChat('user', message);
+            userInput.value = '';
+
+            // Mostrar indicador de escritura
+            typingIndicator.classList.add('active');
+
+            // Obtener respuesta del bot
+            const response = await obtenerRespuesta(message);
+
+            // Ocultar indicador de escritura
+            typingIndicator.classList.remove('active');
+
+            // Agregar respuesta del bot al chat
+            addMessageToChat('bot', response);
+        }
+
+        // Función para agregar mensajes al chat
+        function addMessageToChat(sender, message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+
+            const messageWrapper = document.createElement('div');
+            messageWrapper.classList.add('message-wrapper');
+
+            // Crear avatar
+            const avatar = document.createElement('div');
+            avatar.classList.add(sender === 'user' ? 'user-avatar' : 'bot-avatar');
+            avatar.innerHTML = sender === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-leaf"></i>';
+
+            // Crear contenido del mensaje
+            const messageContent = document.createElement('div');
+            messageContent.classList.add('message-content');
+            messageContent.textContent = message;
+
+            // Crear timestamp
+            const timestamp = document.createElement('div');
+            timestamp.classList.add('timestamp');
+            const now = new Date();
+            timestamp.textContent = `Hoy, ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+            // Estructurar el mensaje
+            const messageInfo = document.createElement('div');
+            messageInfo.appendChild(messageContent);
+            messageInfo.appendChild(timestamp);
+
+            if (sender === 'user') {
+                messageWrapper.appendChild(messageInfo);
+                messageWrapper.appendChild(avatar);
+            } else {
+                messageWrapper.appendChild(avatar);
+                messageWrapper.appendChild(messageInfo);
+            }
+
+            messageDiv.appendChild(messageWrapper);
+            chatContainer.appendChild(messageDiv);
+
+            // Scroll al final del chat
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Función para obtener respuesta de la API de Gemini
+        async function obtenerRespuesta(pregunta) {
+            // Agregar la pregunta del usuario al historial
+            historialConversacion.push({
+                role: "user",
+                parts: [{ text: pregunta }]
+            });
+
+            // Crear el prompt con la base de datos y la pregunta
+            const promptBase = `Eres un asistente experto en áreas protegidas y regulaciones ambientales en Belice.
+            Tu función es responder preguntas basándote exclusivamente en la siguiente base de datos:
+
+            ${JSON.stringify(datos)}
+
+            Instrucciones:
+            1. Responde de manera clara y concisa.
+            2. Si la información para responder la pregunta está en la base de datos, úsala.
+            3. Si la información no está en la base de datos, indica amablemente que no tienes esa información específica.
+            4. Mantén un tono profesional pero accesible.
+            5. Ofrece preguntas de seguimiento relacionadas con el tema cuando sea apropiado.
+            6. No inventes información que no esté en la base de datos.
+            7. Puedes hacer referencia a los IDs de restricción o datos cuando sea relevante.
+
+            Pregunta del usuario: ${pregunta}`;
+
+            // Preparar contenidos para Gemini
+            const contenidos = [
+                {
+                    role: "user",
+                    parts: [{ text: promptBase }]
+                }
+            ];
+
+            // Agregar historial de conversación
+            contenidos.push(...historialConversacion);
+
+            const requestBody = {
+                contents: contenidos
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error en la petición: ${response.status} ${response.statusText}`);
+                }
+
+                const dataResp = await response.json();
+
+                // Manejo seguro de la respuesta
+                if (dataResp?.candidates?.[0]?.content?.parts?.[0]?.text) {
+                    const respuesta = dataResp.candidates[0].content.parts[0].text.trim();
+                    
+                    // Agregar la respuesta del modelo al historial
+                    historialConversacion.push({
+                        role: "model",
+                        parts: [{ text: respuesta }]
+                    });
+
+                    return respuesta;
+                } else {
+                    throw new Error("Respuesta inesperada de la API de Gemini");
+                }
+            } catch (error) {
+                console.error("Error al llamar a la API de Gemini:", error);
+                return "Lo siento, ocurrió un error al procesar tu pregunta. Por favor, intenta nuevamente más tarde.";
+            }
+        }
+
+        // Función para limpiar el historial
+        function limpiarHistorial() {
+            historialConversacion = [];
+        }
+    </script>
+</body>
+</html>
