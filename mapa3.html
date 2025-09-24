@@ -1,0 +1,1665 @@
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>
+                body {
+                  background-color: white; /* Ensure the iframe has a white background */
+                }
+    
+                
+              </style>
+                        </head>
+                        <body>
+                            <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador de Restricciones Legales - EUDR</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+        .container {
+            max-width: 1400px;
+        }
+        .filter-section {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+        .filter-group {
+            margin-bottom: 1rem;
+        }
+        .stats-card {
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+        .stats-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+        .table-container {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        .badge {
+            font-weight: 500;
+        }
+        .badge-eudr {
+            background-color: #27ae60;
+        }
+        .badge-buffer {
+            background-color: #e74c3c;
+        }
+        .badge-ap {
+            background-color: #3498db;
+        }
+        .badge-otros {
+            background-color: #95a5a6;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+        .btn-export {
+            background-color: #27ae60;
+            border-color: #27ae60;
+        }
+        .btn-export:hover {
+            background-color: #219a52;
+            border-color: #219a52;
+        }
+        .country-flag {
+            width: 24px;
+            height: 16px;
+            margin-right: 8px;
+            border-radius: 3px;
+            object-fit: cover;
+        }
+        .priority-high {
+            background-color: #ffebee;
+            border-left: 4px solid #e53935;
+        }
+        .priority-medium {
+            background-color: #fff8e1;
+            border-left: 4px solid #fb8c00;
+        }
+        .priority-low {
+            background-color: #e8f5e8;
+            border-left: 4px solid #43a047;
+        }
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        .search-highlight {
+            background-color: #fff3cd;
+            font-weight: bold;
+        }
+        .detail-modal .modal-dialog {
+            max-width: 90%;
+            max-height: 90vh;
+        }
+        .detail-content {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .info-icon {
+            cursor: pointer;
+            color: #3498db;
+            margin-left: 5px;
+        }
+        .info-icon:hover {
+            color: #2980b9;
+        }
+        .filter-badge {
+            background-color: #3498db;
+            color: white;
+            border-radius: 12px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+        .active-filters {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+            display: none;
+        }
+        /* Estilos para el mapa */
+        #map {
+            height: 500px;
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            z-index: 0;
+        }
+        .map-container {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+        .layer-control {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 1rem;
+        }
+        .legend {
+            padding: 6px 8px;
+            background: white;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            line-height: 18px;
+            color: #555;
+        }
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+        .map-info {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #e8f4fd;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        .tab-content {
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .nav-tabs {
+            border-bottom: none;
+        }
+        .nav-link {
+            color: #3498db;
+            border: none;
+            border-bottom: 3px solid transparent;
+            border-radius: 0;
+            margin-right: 0.5rem;
+            padding: 1rem 1.5rem;
+        }
+        .nav-link.active {
+            color: #3498db;
+            border-color: #3498db;
+            background-color: white;
+        }
+        .tab-pane {
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .feature-info {
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border-left: 4px solid #3498db;
+        }
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            border-radius: 10px;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1 class="display-5">Visualizador de Restricciones Legales</h1>
+            <p class="lead">Sistema de información geoespacial para el cumplimiento del Reglamento Europeo sobre Productos Libres de Deforestación (EUDR)</p>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="filter-section">
+                    <h3><i class="fas fa-filter"></i> Filtros de Búsqueda</h3>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="filter-group">
+                                <label for="countryFilter" class="form-label">País</label>
+                                <select id="countryFilter" class="form-select">
+                                    <option value="">Todos los países</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="filter-group">
+                                <label for="typeFilter" class="form-label">Tipo de Restricción</label>
+                                <select id="typeFilter" class="form-select">
+                                    <option value="">Todos los tipos</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="filter-group">
+                                <label for="eudrFilter" class="form-label">Pertinencia EUDR</label>
+                                <select id="eudrFilter" class="form-select">
+                                    <option value="">Todas</option>
+                                    <option value="Alta">Alta</option>
+                                    <option value="Media">Media</option>
+                                    <option value="Baja">Baja</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="filter-group">
+                                <label for="searchInput" class="form-label">Búsqueda Rápida</label>
+                                <input type="text" id="searchInput" class="form-control" placeholder="Buscar por norma, descripción, etc.">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <button id="applyFilters" class="btn btn-primary"><i class="fas fa-search"></i> Aplicar Filtros</button>
+                            <button id="resetFilters" class="btn btn-outline-secondary"><i class="fas fa-undo"></i> Limpiar</button>
+                        </div>
+                    </div>
+                    <div id="activeFilters" class="active-filters">
+                        <strong>Filtros activos:</strong>
+                        <div id="filterBadges"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Pestañas para Mapa y Tabla -->
+        <div class="row">
+            <div class="col-12">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="map-tab" data-bs-toggle="tab" data-bs-target="#map-tab-pane" type="button" role="tab" aria-controls="map-tab-pane" aria-selected="true">
+                            <i class="fas fa-map"></i> Vista Geográfica
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="table-tab" data-bs-toggle="tab" data-bs-target="#table-tab-pane" type="button" role="tab" aria-controls="table-tab-pane" aria-selected="false">
+                            <i class="fas fa-table"></i> Vista Tabular
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <!-- Pestaña del Mapa -->
+                    <div class="tab-pane fade show active" id="map-tab-pane" role="tabpanel" aria-labelledby="map-tab" tabindex="0">
+                        <div class="map-container">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3><i class="fas fa-layer-group"></i> Capas Geográficas</h3>
+                                    <div class="layer-control">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h5>Capas Base</h5>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="baseLayer" id="osmBase" value="osm" checked>
+                                                    <label class="form-check-label" for="osmBase">
+                                                        OpenStreetMap
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="baseLayer" id="satelliteBase" value="satellite">
+                                                    <label class="form-check-label" for="satelliteBase">
+                                                        Imágenes Satelitales
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="baseLayer" id="topoBase" value="topo">
+                                                    <label class="form-check-label" for="topoBase">
+                                                        Mapa Topográfico
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h5>Capas Temáticas</h5>
+                                                <div class="form-check">
+                                                    <input class="form-check-input overlay-layer" type="checkbox" id="allRestrictionsLayer" value="allRestrictions" checked>
+                                                    <label class="form-check-label" for="allRestrictionsLayer">
+                                                        Todas las Restricciones
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="map"></div>
+                            <div class="map-info">
+                                <h5><i class="fas fa-info-circle"></i> Información del Mapa</h5>
+                                <p>Este mapa muestra las restricciones legales georreferenciadas para el cumplimiento del EUDR. 
+                                   Puede cambiar las capas base y superponer diferentes tipos de restricciones. 
+                                   Haga clic en cualquier polígono para ver información detallada.</p>
+                                <div id="featureInfo" class="feature-info" style="display: none;">
+                                    <h6><i class="fas fa-map-marker-alt"></i> Detalle de la Restricción Seleccionada</h6>
+                                    <div id="featureContent"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Pestaña de la Tabla -->
+                    <div class="tab-pane fade" id="table-tab-pane" role="tabpanel" aria-labelledby="table-tab" tabindex="0">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 mb-4">
+                                <div class="card stats-card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Total Restricciones</h5>
+                                        <p class="stats-number" id="totalRestrictions">0</p>
+                                        <p class="card-text">En todos los países de la región SICA</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-4">
+                                <div class="card stats-card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Restricciones EUDR Alta</h5>
+                                        <p class="stats-number" id="highEudr">0</p>
+                                        <p class="card-text">Prioridad para cumplimiento</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-4">
+                                <div class="card stats-card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Áreas Protegidas</h5>
+                                        <p class="stats-number" id="protectedAreas">0</p>
+                                        <p class="card-text">Normativas de conservación</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-4">
+                                <div class="card stats-card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Buffers Hídricos</h5>
+                                        <p class="stats-number" id="waterBuffers">0</p>
+                                        <p class="card-text">Protección de fuentes de agua</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <div class="action-buttons">
+                                <button id="exportExcel" class="btn btn-export"><i class="fas fa-file-excel"></i> Exportar a Excel</button>
+                                <button id="exportPDF" class="btn btn-outline-secondary"><i class="fas fa-file-pdf"></i> Exportar a PDF</button>
+                                <div class="ms-auto">
+                                    <span id="resultsCount" class="badge bg-secondary">0 resultados</span>
+                                </div>
+                            </div>
+                            <div id="noResults" class="no-results">
+                                <i class="fas fa-search fa-3x mb-3"></i>
+                                <h4>No se encontraron resultados</h4>
+                                <p>Intenta ajustar tus filtros o realizar una nueva búsqueda.</p>
+                            </div>
+                            <div class="table-responsive">
+                                <table id="restrictionsTable" class="table table-striped table-hover" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>País</th>
+                                            <th>ID Restricción</th>
+                                            <th>Normativa</th>
+                                            <th>Descripción</th>
+                                            <th>Tipo</th>
+                                            <th>Pertinencia EUDR</th>
+                                            <th>Dataset</th>
+                                            <th>Geoproceso</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Los datos se cargarán aquí dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal de Detalle -->
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailModalLabel">Detalle de la Restricción</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body detail-content" id="modalContent">
+                    <!-- Contenido dinámico -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="text-center">
+        <div class="container">
+            <p>Visualizador de Restricciones Legales para el cumplimiento del EUDR - Proyecto "Paisajes Forestales y Comercio Sostenible"</p>
+            <p>© 2025 - Sistema de Información Geoespacial</p>
+        </div>
+    </footer>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Datos simulados con GeoJSON de ejemplo (máximo 5 puntos por polígono)
+        const restrictionsData = [
+            {
+                "País/Jurisdicción": "Belice",
+                "Normativa aplicable": "National Protected Areas System Act, Cap.215 (Revised Ed. 2020)",
+                "Fecha_norma": "44196",
+                "Articulo_norma": "Varias",
+                "Nivel_escala": "Nacional",
+                "Institución responsable": "Forest Department / Fisheries Department / NICH (según categoría)",
+                "Descripción_restriccion": "Prohíbe asentarse, construir, cazar, talar, remover flora, abrir caminos, etc., dentro de áreas protegidas sin permiso escrito; categorías y límites establecidos por Gaceta.",
+                "Tipo_restriccion": "Uso del suelo / Conservación",
+                "Cuantificable": "Sí",
+                "Parametros_geo": "Límite oficial de cada AP según SI/Gaceta",
+                "Representacion": "Polígono oficial por decreto",
+                "Enlace_norma": "https://faolex.fao.org/docs/pdf/blz163048.pdf",
+                "Observaciones Relevantes": "Vigente. Se propone reemplazar por NPAS 2024 (aún en borrador). (FAOLEX)",
+                "Pertinencia EUDR": "Asegura exclusión de producción en APs y soporte a debida diligencia (ubicación/tenencia).",
+                "ID_Restriccion": "BLZ_NPAS_2020_001",
+                "Tipo_Analisis": "Screening EUDR: exclusión de parcelas agrícolas en AP",
+                "ID_Dato": "BLZ_DAT_PA_2024_001",
+                "Nombre de la Capa": "Protected Areas of Belize (Nacional)",
+                "Geoproceso a realizar": "Intersect(parcela, AP) para identificar predios que caen dentro de áreas protegidas y Exclude(parcela ∈ AP) para descartarlos de usos productivos no permitidos.",
+                "Entregable": "",
+                "Link_Entregable": "",
+                "Nombre de la Capa.1": "Protected Areas of Belize (Nacional)",
+                "Fecha_dataset": "2023-09-01?",
+                "Descripcion_dataset": "Polígonos de todas las áreas protegidas terrestres y marinas reconocidas oficialmente, con categoría y límites administrativos",
+                "Uso en el análisis geoespacial": "Verificación de límites legales; intersección con parcelas agrícolas; exclusiones por AP; cumplimiento EUDR",
+                "Proveedor_dataset": "Forest Department / NBIO / BERDS",
+                "Cobertura espacial": "Nacional",
+                "Fuente": "BERDS / ArcGIS Government Viewer",
+                "Licencia/Condiciones de uso": "Uso oficial nacional (revisar términos BERDS)",
+                "Contacto oficial": "Forest Department de Belice",
+                "Enlace_dataset": "https://www.arcgis.com/apps/Viewer/index.html?appid=e56d47a528f14c38bf6e0309eeefa08b",
+                "Observaciones_dataset": "Fuente nacional principal; puede incluir AP marinas.",
+                "geojson": {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Área Protegida en Belice",
+                        "country": "Belice",
+                        "type": "Área Protegida"
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[[-88.9, 17.6], [-88.1, 17.6], [-88.1, 18.4], [-88.9, 18.4], [-88.9, 17.6]]]
+                    }
+                }
+            },
+            {
+                "País/Jurisdicción": "Belice",
+                "Normativa aplicable": "National Protected Areas Systems Bill, 2024 (Borrador)",
+                "Fecha_norma": "2024-03-??",
+                "Articulo_norma": "Sec. 18(4)-(5)",
+                "Nivel_escala": "Nacional",
+                "Institución responsable": "Ministro responsable (Forestry/Fisheries/Biodiversity) + Lands Dept.",
+                "Descripción_restriccion": "Cualquier disposición de tierras dentro de un Área Protegida es nula; se requiere consentimiento expreso ministerial para cualquier disposición.",
+                "Tipo_restriccion": "Uso del suelo / Tenencia",
+                "Cuantificable": "Sí",
+                "Parametros_geo": "Límite legal de AP; cruces catastrales",
+                "Representacion": "Polígono AP vs. parcelas",
+                "Enlace_norma": "https://sustainabledevelopment.gov.bz/wp-content/uploads/2024/04/National-Protected-Areas-Systems-Act-2024-Final-Draft-23-4-2024.pdf",
+                "Observaciones Relevantes": "Protege integridad de APs frente a titulación/transferencias.",
+                "Pertinencia EUDR": "Clave para EUDR (derechos de uso/tenencia y exclusión de deforestación en tierras con estatus AP).",
+                "ID_Restriccion": "BLZ_NPASBILL_2024_002",
+                "Tipo_Analisis": "Screening EUDR: exclusión de tierras en disposición dentro de AP",
+                "ID_Dato": "BLZ_DAT_PA_2024_001",
+                "Nombre de la Capa": "Protected Areas of Belize (Nacional)",
+                "Geoproceso a realizar": "Overlay(capa catastral, AP) para identificar y anular posibles títulos/ventas de tierras dentro de AP.",
+                "Entregable": "",
+                "Link_Entregable": "",
+                "Nombre de la Capa.1": "Protected Areas of Belize (Nacional)",
+                "Fecha_dataset": "2023-09-01?",
+                "Descripcion_dataset": "Polígonos de todas las áreas protegidas terrestres y marinas reconocidas oficialmente, con categoría y límites administrativos",
+                "Uso en el análisis geoespacial": "Verificación de límites legales; intersección con parcelas agrícolas; exclusiones por AP; cumplimiento EUDR",
+                "Proveedor_dataset": "Forest Department / NBIO / BERDS",
+                "Cobertura espacial": "Nacional",
+                "Fuente": "BERDS / ArcGIS Government Viewer",
+                "Licencia/Condiciones de uso": "Uso oficial nacional (revisar términos BERDS)",
+                "Contacto oficial": "Forest Department de Belice",
+                "Enlace_dataset": "https://www.arcgis.com/apps/Viewer/index.html?appid=e56d47a528f14c38bf6e0309eeefa08b",
+                "Observaciones_dataset": "Fuente nacional principal; puede incluir AP marinas.",
+                "geojson": {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Área Protegida en Belice (Borrador)",
+                        "country": "Belice",
+                        "type": "Área Protegida"
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[[-88.8, 17.7], [-88.2, 17.7], [-88.2, 18.3], [-88.8, 18.3], [-88.8, 17.7]]]
+                    }
+                }
+            },
+            {
+                "País/Jurisdicción": "Costa Rica",
+                "Normativa aplicable": "Ley 7575 – Ley Forestal",
+                "Fecha_norma": "35108",
+                "Articulo_norma": "Art. 1",
+                "Nivel_escala": "Nacional",
+                "Institución responsable": "MINAE",
+                "Descripción_restriccion": "Prohíbe la corta/aprovechamiento de bosques naturales en parques, reservas biológicas, manglares, zonas protectoras, refugios y reservas forestales estatales.",
+                "Tipo_restriccion": "Uso del suelo / Conservación",
+                "Cuantificable": "Sí",
+                "Parametros_geo": "Polígonos de ASP y bosque natural estatal",
+                "Representacion": "Capa vectorial (ASP + cobertura forestal)",
+                "Enlace_norma": "https://pgrweb.go.cr/scij/Busqueda/Normativa/nrm_texto_completo.aspx?nValor1=1&nValor2=41661",
+                "Observaciones Relevantes": "Aplica a bosques naturales de dominio público.",
+                "Pertinencia EUDR": "Garantiza que no exista deforestación ni conversión en áreas legalmente protegidas, lo que coincide directamente con las exigencias del EUDR.",
+                "ID_Restriccion": "R_CR_001",
+                "Tipo_Analisis": "",
+                "ID_Dato": "",
+                "Nombre de la Capa": "",
+                "Geoproceso a realizar": "",
+                "Entregable": "",
+                "Link_Entregable": "",
+                "Nombre de la Capa.1": "",
+                "Fecha_dataset": "",
+                "Descripcion_dataset": "",
+                "Uso en el análisis geoespacial": "",
+                "Proveedor_dataset": "",
+                "Cobertura espacial": "",
+                "Fuente": "",
+                "Licencia/Condiciones de uso": "",
+                "Contacto oficial": "",
+                "Enlace_dataset": "",
+                "Observaciones_dataset": "",
+                "geojson": {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Área Protegida en Costa Rica",
+                        "country": "Costa Rica",
+                        "type": "Área Protegida"
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[[-83.9, 9.6], [-83.1, 9.6], [-83.1, 10.4], [-83.9, 10.4], [-83.9, 9.6]]]
+                    }
+                }
+            },
+            {
+                "País/Jurisdicción": "El Salvador",
+                "Normativa aplicable": "Ley Forestal (Decreto Leg. Nº 852)",
+                "Fecha_norma": "37424",
+                "Articulo_norma": "Art. 12",
+                "Nivel_escala": "Nacional",
+                "Institución responsable": "MAG (Ministerio de Agricultura y Ganadería)",
+                "Descripción_restriccion": "Prohíbe el cambio de uso de suelos clase VI, VII y VIII que estén cubiertos de árboles.",
+                "Tipo_restriccion": "Uso del suelo",
+                "Cuantificable": "Sí",
+                "Parametros_geo": "Suelos clase VI–VIII con cobertura arbórea",
+                "Representacion": "Polígono de suelos VI–VIII ∩ cobertura arbolada (binaria)",
+                "Enlace_norma": "https://faolex.fao.org/docs/pdf/els32322.pdf",
+                "Observaciones Relevantes": "Aplica aunque se permite manejo forestal sostenible sin cambiar uso.",
+                "Pertinencia EUDR": "Evita conversión de bosques en tierras de alta pendiente/fragilidad → clave para “libre de deforestación”.",
+                "ID_Restriccion": "SV-RES-0001",
+                "Tipo_Analisis": "Elegibilidad de suelo",
+                "ID_Dato": "SV-DAT-0001",
+                "Nombre de la Capa": "Mapa Digital de Suelos (CENTA)",
+                "Geoproceso a realizar": "Filtrar polígonos/clases VI, VII, VIII → disolver por clase → generar máscara de exclusión de suelo",
+                "Entregable": "",
+                "Link_Entregable": "",
+                "Nombre de la Capa.1": "Mapa Digital de Suelos",
+                "Fecha_dataset": "? (2020–2022)",
+                "Descripcion_dataset": "Cartografía de suelos con propiedades físico-químicas y capacidad de uso",
+                "Uso en el análisis geoespacial": "Delimitar suelos de alta restricción (clases VI–VIII) y cruzarlos con cobertura arbórea",
+                "Proveedor_dataset": "CENTA / MAG",
+                "Cobertura espacial": "Nacional",
+                "Fuente": "CENTA",
+                "Licencia/Condiciones de uso": "?",
+                "Contacto oficial": "CENTA",
+                "Enlace_dataset": "https://www.centa.gob.sv/mapa-digital-de-suelos/",
+                "Observaciones_dataset": "Confirmar disponibilidad en shapefile con clasificación legal VI–VIII",
+                "geojson": {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Restricción de Suelo en El Salvador",
+                        "country": "El Salvador",
+                        "type": "Restricción de Suelo"
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[[-89.4, 13.6], [-88.6, 13.6], [-88.6, 14.4], [-89.4, 14.4], [-89.4, 13.6]]]
+                    }
+                }
+            },
+            {
+                "País/Jurisdicción": "Guatemala",
+                "Normativa aplicable": "Decreto 126-97 — Ley de Reservas Territoriales",
+                "Fecha_norma": "35782",
+                "Articulo_norma": "Art. 1-2",
+                "Nivel_escala": "Nacional",
+                "Institución responsable": "OCRET / MAGA",
+                "Descripción_restriccion": "Zona de reserva de 50 m alrededor de nacimientos de agua",
+                "Tipo_restriccion": "Buffer a fuentes",
+                "Cuantificable": "Sí",
+                "Parametros_geo": "50 m radio",
+                "Representacion": "Buffer circular",
+                "Enlace_norma": "https://faolex.fao.org/docs/pdf/gua122119.pdf",
+                "Observaciones Relevantes": "Requiere inventario de nacimientos",
+                "Pertinencia EUDR": "Garantiza la protección de fuentes de agua esenciales, evitando su conversión y cumpliendo criterios de sostenibilidad y trazabilidad EUDR.",
+                "ID_Restriccion": "GUA-RES-126-97-04",
+                "Tipo_Analisis": "Buffer nacimientos",
+                "ID_Dato": "GUA-DAT-02",
+                "Nombre de la Capa": "Hidrografía y cuerpos de agua (IDEG)",
+                "Geoproceso a realizar": "Selección de nacimientos + buffer circular 50 m",
+                "Entregable": "",
+                "Link_Entregable": "",
+                "Nombre de la Capa.1": "Hidrografía y cuerpos de agua",
+                "Fecha_dataset": "?",
+                "Descripcion_dataset": "Ríos, lagos, cuencas hidrográficas, fuentes de agua",
+                "Uso en el análisis geoespacial": "Buffers costeros, ribereños, lacustres, cuencas críticas",
+                "Proveedor_dataset": "IDEG / SEGEPLAN",
+                "Cobertura espacial": "Nacional",
+                "Fuente": "Geoportal IDEG",
+                "Licencia/Condiciones de uso": "?",
+                "Contacto oficial": "SEGEPLAN",
+                "Enlace_dataset": "https://ideg.segeplan.gob.gt/geoportal/",
+                "Observaciones_dataset": "Requiere identificar ríos navegables y nacimientos de agua",
+                "geojson": {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Buffer Hídrico en Guatemala",
+                        "country": "Guatemala",
+                        "type": "Buffer Hídrico"
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[[-90.9, 15.1], [-90.1, 15.1], [-90.1, 15.9], [-90.9, 15.9], [-90.9, 15.1]]]
+                    }
+                }
+            },
+            {
+                "País/Jurisdicción": "Guatemala",
+                "Normativa aplicable": "Decreto 4-89 — Ley de Áreas Protegidas (reformada 110-96)",
+                "Fecha_norma": "32518",
+                "Articulo_norma": "Arts. 7-8, 16, 48",
+                "Nivel_escala": "Nacional",
+                "Institución responsable": "CONAP",
+                "Descripción_restriccion": "Sistema Guatemalteco de Áreas Protegidas (SIGAP) y sus zonas de amortiguamiento",
+                "Tipo_restriccion": "Conservación AP",
+                "Cuantificable": "Sí",
+                "Parametros_geo": "Polígonos SIGAP + buffer",
+                "Representacion": "Polígonos oficiales",
+                "Enlace_norma": "https://sip.conap.gob.gt/wp-content/uploads/2022/02/Ley-de-Areas-Protegidas-y-su-Reglamento.-Decreto-4-89.pdf",
+                "Observaciones Relevantes": "32% del territorio bajo SIGAP; condicional a planes de manejo",
+                "Pertinencia EUDR": "Prohíbe deforestación y conversión en AP y amortiguamiento, asegurando cumplimiento de la cláusula de “no conversión” del EUDR.",
+                "ID_Restriccion": "GUA-RES-4-89-01",
+                "Tipo_Analisis": "Áreas Protegidas",
+                "ID_Dato": "GUA-DAT-07",
+                "Nombre de la Capa": "SIGAP — Áreas Protegidas",
+                "Geoproceso a realizar": "Usar polígonos directos; para amortiguamiento generar buffer según plan maestro",
+                "Entregable": "",
+                "Link_Entregable": "",
+                "Nombre de la Capa.1": "SIGAP — Áreas Protegidas",
+                "Fecha_dataset": "Actualización continua",
+                "Descripcion_dataset": "Polígonos de todas las Áreas Protegidas del SIGAP",
+                "Uso en el análisis geoespacial": "Implementar restricción de AP (Decreto 4-89)",
+                "Proveedor_dataset": "CONAP",
+                "Cobertura espacial": "Nacional",
+                "Fuente": "Geoportal CONAP",
+                "Licencia/Condiciones de uso": "?",
+                "Contacto oficial": "CONAP",
+                "Enlace_dataset": "https://conap.gob.gt/direccion-de-analisis-geoespacial/",
+                "Observaciones_dataset": "Capa oficial, sustituye necesidad de WDPA",
+                "geojson": {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Área Protegida en Guatemala",
+                        "country": "Guatemala",
+                        "type": "Área Protegida"
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[[-90.8, 15.2], [-90.2, 15.2], [-90.2, 15.8], [-90.8, 15.8], [-90.8, 15.2]]]
+                    }
+                }
+            },
+            {
+                "País/Jurisdicción": "Costa Rica",
+                "Normativa aplicable": "Ley 7779 – Uso, Manejo y Conservación de Suelos",
+                "Fecha_norma": "35915",
+                "Articulo_norma": "Art. 19 (+ reglamentos)",
+                "Nivel_escala": "Nacional",
+                "Institución responsable": "MAG / MINAE",
+                "Descripción_restriccion": "Uso según capacidad de uso; suelos de vocación forestal (clases VII–VIII) y altas pendientes no pueden destinarse a agricultura/ganadería.",
+                "Tipo_restriccion": "Uso de suelo condicionado",
+                "Cuantificable": "Sí",
+                "Parametros_geo": "Pendientes ≥60% y clases de capacidad VII–VIII",
+                "Representacion": "Condicional (DEM y clasificación suelos)",
+                "Enlace_norma": "https://pgrweb.go.cr/scij/Busqueda/Normativa/Normas/nrm_texto_completo.aspx?nValor1=1&nValor2=39807",
+                "Observaciones Relevantes": "Depende de metodología MAG/INTA.",
+                "Pertinencia EUDR": "Evita la conversión de suelos frágiles y de vocación forestal a usos agrícolas, alineado al principio de no conversión del EUDR.",
+                "ID_Restriccion": "R_CR_015",
+                "Tipo_Analisis": "Uso de suelo condicionado",
+                "ID_Dato": "D_CR_07",
+                "Nombre de la Capa": "Capacidad de Uso de la Tierra",
+                "Geoproceso a realizar": "Identificación de clases VII–VIII y pendientes ≥60%",
+                "Entregable": "",
+                "Link_Entregable": "",
+                "Nombre de la Capa.1": "Capacidad de Uso de la Tierra",
+                "Fecha_dataset": "2017–2023",
+                "Descripcion_dataset": "Clasificación de tierras (clases I–VIII) según vocación y pendiente.",
+                "Uso en el análisis geoespacial": "Identificar suelos de vocación forestal (clases VII–VIII) y pendientes ≥60%.",
+                "Proveedor_dataset": "INTA / MAG",
+                "Cobertura espacial": "Nacional",
+                "Fuente": "SNIT",
+                "Licencia/Condiciones de uso": "Uso público con cita",
+                "Contacto oficial": "INTA",
+                "Enlace_dataset": "https://www.snitcr.go.cr/Metadatos/full_metadata2?k=Y2FwYTo6SU5UQTo6SU5UQS1NQUdfY2FwVXNvXzUw",
+                "Observaciones_dataset": "Confirmado en metadatos SNIT; escala 1:50 000; shapefile.",
+                "geojson": {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Restricción de Suelo en Costa Rica",
+                        "country": "Costa Rica",
+                        "type": "Restricción de Suelo"
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[[-83.8, 9.3], [-83.2, 9.3], [-83.2, 9.7], [-83.8, 9.7], [-83.8, 9.3]]]
+                    }
+                }
+            },
+            {
+                "País/Jurisdicción": "El Salvador",
+                "Normativa aplicable": "Ley de Áreas Naturales Protegidas (LANP) (Decreto Leg. Nº 579)",
+                "Fecha_norma": "38398",
+                "Articulo_norma": "Art. 19",
+                "Nivel_escala": "Nacional/ANP",
+                "Institución responsable": "MARN (Ministerio de Medio Ambiente y Recursos Naturales)",
+                "Descripción_restriccion": "Zonas de amortiguamiento de ANP: se determinan en el Plan de Manejo y regulan actividades productivas para compatibilidad con conservación.",
+                "Tipo_restriccion": "ANP/Amortiguamiento",
+                "Cuantificable": "Sí",
+                "Parametros_geo": "Límite de ANP + polígono de amortiguamiento del Plan de Manejo",
+                "Representacion": "Polígono(s) según plan vigente de cada ANP",
+                "Enlace_norma": "https://faolex.fao.org/docs/pdf/els53339.pdf",
+                "Observaciones Relevantes": "Extensión exacta depende de cada Plan de Manejo → colocar “?” si no hay plan publicado.",
+                "Pertinencia EUDR": "Restringe o condiciona actividades agrícolas/ganaderas/maderables contiguas a ANP.",
+                "ID_Restriccion": "SV-RES-0005",
+                "Tipo_Analisis": "ANP – amortiguamiento",
+                "ID_Dato": "SV-DAT-0011",
+                "Nombre de la Capa": "Áreas Naturales Protegidas – RMGIR",
+                "Geoproceso a realizar": "Seleccionar ANP de interés → unión con polígono de amortiguamiento oficial (si disponible) o marcar “?” y crear buffer referencial ? m hasta obtener Plan",
+                "Entregable": "",
+                "Link_Entregable": "",
+                "Nombre de la Capa.1": "Áreas Naturales Protegidas – RMGIR",
+                "Fecha_dataset": "2022-06-??",
+                "Descripcion_dataset": "Polígonos de ANP declaradas y en proceso",
+                "Uso en el análisis geoespacial": "Identificar áreas protegidas para verificar superposición de proyectos",
+                "Proveedor_dataset": "MARN / RMGIR",
+                "Cobertura espacial": "Nacional",
+                "Fuente": "RMGIR",
+                "Licencia/Condiciones de uso": "?",
+                "Contacto oficial": "MARN",
+                "Enlace_dataset": "http://rmgir.proyectomesoamerica.org/server/rest/services/RMGIR/ElSalvadorDatosBasicos/MapServer/19",
+                "Observaciones_dataset": "No incluye polígonos de amortiguamiento",
+                "geojson": {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Área Protegida en El Salvador",
+                        "country": "El Salvador",
+                        "type": "Área Protegida"
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[[-89.3, 13.7], [-88.7, 13.7], [-88.7, 14.3], [-89.3, 14.3], [-89.3, 13.7]]]
+                    }
+                }
+            },
+            {
+                "País/Jurisdicción": "Belice",
+                "Normativa aplicable": "Forests (Protection of Mangroves) Regulations, 2018 (SI No. 94/2018)",
+                "Fecha_norma": "43266",
+                "Articulo_norma": "Regs. Part II–III (prohibiciones y permisos)",
+                "Nivel_escala": "Nacional / Sitio",
+                "Institución responsable": "Forest Department",
+                "Descripción_restriccion": "Prohíbe cortar/remover/alterar manglar sin permiso; fortalece sanciones y proceso de permisos.",
+                "Tipo_restriccion": "Prohibición específica (manglar)",
+                "Cuantificable": "Sí",
+                "Parametros_geo": "Polígonos de manglar (ecosistema)",
+                "Representacion": "Polígono de manglar",
+                "Enlace_norma": "wwflac.awsassets.panda.org/.../forests_protection_of_mangroves_regualtion_2018_final_enacted_1.pdf (WWF)",
+                "Observaciones Relevantes": "Ver: https://digitalcommons.usf.edu/strong_coasts_pubs/6/",
+                "Pertinencia EUDR": "Evita deforestación de manglar (riesgo EUDR costero).",
+                "ID_Restriccion": "BLZ_MANGROVE_SI94_2018_003",
+                "Tipo_Analisis": "No conversión de manglar (protección estricta)",
+                "ID_Dato": "BLZ_DAT_FS_2023_004",
+                "Nombre de la Capa": "Forest Cover & Land Use (GSMU)",
+                "Geoproceso a realizar": "Filter(cover, clase = \"Mangrove\") para derivar el polígono de manglares; Intersect(parcela, manglar) para ubicar predios en manglar y Exclude/Flag según si existe o no permiso.",
+                "Entregable": "",
+                "Link_Entregable": "",
+                "Nombre de la Capa.1": "Cobertura Forestal / Uso del Suelo / Monitoreo Espacial – Forest Department GSMU",
+                "Fecha_dataset": "2022-2023",
+                "Descripcion_dataset": "Mapas recientes de cobertura forestal, uso del suelo, cambios a nivel nacional, los cuales incluyen AP como capa para monitoreo espacial",
+                "Uso en el análisis geoespacial": "Análisis de cambio de uso dentro/fuera de AP; detección de intrusiones; estimaciones de erosión, etc.",
+                "Proveedor_dataset": "Forest Department – Geospatial Monitoring Unit (Belize)",
+                "Cobertura espacial": "Nacional",
+                "Fuente": "Portal gubernamental / reporte institucional",
+                "Licencia/Condiciones de uso": "Licencia nacional; revisar si para uso público abierto",
+                "Contacto oficial": "GSMU / Forest Dept.",
+                "Enlace_dataset": "Página Web Geospatial Monitoring Unit / descarga posibles formatos GIS (Departamento de Bosques de Belice)",
+                "Observaciones_dataset": "Puede requerir procesamientos para alinear sistema de referencia; disponibilidad pública de shapefiles debe confirmarse",
+                "geojson": {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Manglar en Belice",
+                        "country": "Belice",
+                        "type": "Manglar"
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[[-88.7, 17.3], [-88.3, 17.3], [-88.3, 17.7], [-88.7, 17.7], [-88.7, 17.3]]]
+                    }
+                }
+            },
+            {
+                "País/Jurisdicción": "Guatemala",
+                "Normativa aplicable": "Acuerdo Presidencial Zonas de Veda Definitiva",
+                "Fecha_norma": "20627",
+                "Articulo_norma": "Art. 3 inc. c",
+                "Nivel_escala": "Nacional",
+                "Institución responsable": "Presidencia / CONAP",
+                "Descripción_restriccion": "Veda en volcanes: cráter → pendiente del 30%",
+                "Tipo_restriccion": "Zona volcánica",
+                "Cuantificable": "Sí",
+                "Parametros_geo": "Polígono hasta 30% pendiente",
+                "Representacion": "DEM/pendiente",
+                "Enlace_norma": "https://faolex.fao.org/docs/pdf/gua122106.pdf",
+                "Observaciones Relevantes": "Áreas luego protegidas vía SIGAP",
+                "Pertinencia EUDR": "Evita uso agropecuario en volcanes y pendientes críticas, cumpliendo no conversión EUDR.",
+                "ID_Restriccion": "GUA-VEDA-1956-03",
+                "Tipo_Analisis": "Veda volcánica",
+                "ID_Dato": "GUA-DAT-04",
+                "Nombre de la Capa": "Volcanes (RMGIR) + DEM",
+                "Geoproceso a realizar": "Intersección de polígono de volcanes con DEM para delimitar 30% pendiente",
+                "Entregable": "",
+                "Link_Entregable": "",
+                "Nombre de la Capa.1": "Volcanes de Guatemala",
+                "Fecha_dataset": "?",
+                "Descripcion_dataset": "Capa vectorial de localización y límites de volcanes",
+                "Uso en el análisis geoespacial": "Restricción de zonas vedadas en volcanes (≤30% pendiente)",
+                "Proveedor_dataset": "Proyecto Mesoamérica (RMGIR)",
+                "Cobertura espacial": "Nacional",
+                "Fuente": "Servicio REST (ArcGIS)",
+                "Licencia/Condiciones de uso": "?",
+                "Contacto oficial": "Proyecto Mesoamérica",
+                "Enlace_dataset": "http://rmgir.proyectomesoamerica.org/server/rest/services/RMGIR/Guatemala_Fen%C3%B3menos_Geol%C3%B3gicos_WGS1984/MapServer/18",
+                "Observaciones_dataset": "Se debe intersectar con un DEM para delimitar zonas ≤30% pendiente",
+                "geojson": {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Zona Volcánica en Guatemala",
+                        "country": "Guatemala",
+                        "type": "Zona Volcánica"
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[[-90.85, 14.6], [-90.65, 14.6], [-90.65, 14.8], [-90.85, 14.8], [-90.85, 14.6]]]
+                    }
+                }
+            }
+        ];
+        let table;
+        let filteredData = [...restrictionsData];
+        let map;
+        let allRestrictionsLayer;
+        let currentFeature = null;
+        $(document).ready(function() {
+            initializeTable();
+            populateFilters();
+            setupEventListeners();
+            updateStats();
+            initializeMap();
+        });
+        function initializeMap() {
+            // Inicializar el mapa centrado en Centroamérica
+            map = L.map('map').setView([15.0, -89.0], 6);
+            // Capas base
+            const baseLayers = {
+                "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }),
+                "Satellite": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                }),
+                "Topographic": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+                    attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
+                })
+            };
+            // Agregar capa base por defecto
+            baseLayers.OpenStreetMap.addTo(map);
+            // Eventos para cambiar capas base
+            $('input[name="baseLayer"]').on('change', function() {
+                const selectedLayer = $(this).val();
+                // Remover todas las capas base
+                Object.values(baseLayers).forEach(layer => {
+                    map.removeLayer(layer);
+                });
+                // Agregar la capa seleccionada
+                baseLayers[selectedLayer].addTo(map);
+            });
+            // Crear capa única con todas las restricciones
+            allRestrictionsLayer = L.geoJSON(null, {
+                style: function(feature) {
+                    const type = feature.properties.type;
+                    if (type.includes('Área Protegida') || type.includes('Protegido') || type.includes('ANP')) {
+                        return { fillColor: '#3498db', weight: 2, opacity: 1, color: '#2980b9', fillOpacity: 0.7 };
+                    } else if (type.includes('Buffer') || type.includes('agua') || type.includes('hidro')) {
+                        return { fillColor: '#e74c3c', weight: 2, opacity: 1, color: '#c0392b', fillOpacity: 0.7 };
+                    } else if (type.includes('Suelo')) {
+                        return { fillColor: '#27ae60', weight: 2, opacity: 1, color: '#229954', fillOpacity: 0.7 };
+                    } else if (type.includes('Volcánica') || type.includes('Veda')) {
+                        return { fillColor: '#8e44ad', weight: 2, opacity: 1, color: '#7d3c98', fillOpacity: 0.7 };
+                    } else if (type.includes('Manglar')) {
+                        return { fillColor: '#1abc9c', weight: 2, opacity: 1, color: '#16a085', fillOpacity: 0.7 };
+                    }
+                    return { fillColor: '#95a5a6', weight: 2, opacity: 1, color: '#7f8c8d', fillOpacity: 0.7 };
+                },
+                onEachFeature: function(feature, layer) {
+                    layer.on({
+                        click: function(e) {
+                            highlightFeature(e.target);
+                            showFeatureInfo(feature.properties, feature.properties.type);
+                        }
+                    });
+                }
+            });
+            // Agregar todos los GeoJSON
+            restrictionsData.forEach(item => {
+                if (item.geojson) {
+                    allRestrictionsLayer.addData(item.geojson);
+                }
+            });
+            // Agregar por defecto
+            map.addLayer(allRestrictionsLayer);
+            // Evento para las capas temáticas
+            $('#allRestrictionsLayer').on('change', function() {
+                if ($(this).is(':checked')) {
+                    map.addLayer(allRestrictionsLayer);
+                } else {
+                    map.removeLayer(allRestrictionsLayer);
+                }
+            });
+            // Agregar control de capas
+            L.control.layers(baseLayers, {"Todas las Restricciones": allRestrictionsLayer}).addTo(map);
+            // Agregar leyenda
+            addLegend();
+            // Evento para cuando se hace clic en el mapa
+            map.on('click', function() {
+                $('#featureInfo').hide();
+                if (currentFeature) {
+                    resetFeatureStyle(currentFeature);
+                    currentFeature = null;
+                }
+            });
+        }
+        function highlightFeature(feature) {
+            // Restaurar el estilo del feature anterior
+            if (currentFeature) {
+                resetFeatureStyle(currentFeature);
+            }
+            // Resaltar el nuevo feature
+            feature.setStyle({
+                weight: 5,
+                color: '#e74c3c',
+                fillOpacity: 0.9
+            });
+            currentFeature = feature;
+        }
+        function resetFeatureStyle(feature) {
+            const type = feature.feature.properties.type;
+            if (type.includes('Área Protegida') || type.includes('Protegido') || type.includes('ANP')) {
+                feature.setStyle({ fillColor: '#3498db', weight: 2, color: '#2980b9', fillOpacity: 0.7 });
+            } else if (type.includes('Buffer') || type.includes('agua') || type.includes('hidro')) {
+                feature.setStyle({ fillColor: '#e74c3c', weight: 2, color: '#c0392b', fillOpacity: 0.7 });
+            } else if (type.includes('Suelo')) {
+                feature.setStyle({ fillColor: '#27ae60', weight: 2, color: '#229954', fillOpacity: 0.7 });
+            } else if (type.includes('Volcánica') || type.includes('Veda')) {
+                feature.setStyle({ fillColor: '#8e44ad', weight: 2, color: '#7d3c98', fillOpacity: 0.7 });
+            } else if (type.includes('Manglar')) {
+                feature.setStyle({ fillColor: '#1abc9c', weight: 2, color: '#16a085', fillOpacity: 0.7 });
+            } else {
+                feature.setStyle({ fillColor: '#95a5a6', weight: 2, color: '#7f8c8d', fillOpacity: 0.7 });
+            }
+        }
+        function showFeatureInfo(properties, type) {
+            let content = `
+                <strong>${properties.name}</strong><br>
+                <strong>País:</strong> ${properties.country}<br>
+                <strong>Tipo:</strong> ${properties.type}<br>
+                <button class="btn btn-sm btn-primary mt-2" onclick="showDetailForCountry('${properties.country}')">Ver Detalle Completo</button>
+            `;
+            $('#featureContent').html(content);
+            $('#featureInfo').show();
+        }
+        function showDetailForCountry(country) {
+            // Buscar la primera restricción para este país
+            const item = restrictionsData.find(row => row["País/Jurisdicción"] === country);
+            if (item) {
+                showDetailModal(item.ID_Restriccion);
+            }
+        }
+        function addLegend() {
+            const legend = L.control({position: 'bottomright'});
+            legend.onAdd = function (map) {
+                const div = L.DomUtil.create('div', 'legend');
+                div.innerHTML = '<h4>Leyenda</h4>' +
+                    '<i style="background:#3498db"></i> Áreas Protegidas<br>' +
+                    '<i style="background:#e74c3c"></i> Buffers Hídricos<br>' +
+                    '<i style="background:#27ae60"></i> Restricciones de Suelo<br>' +
+                    '<i style="background:#8e44ad"></i> Zonas Volcánicas<br>' +
+                    '<i style="background:#1abc9c"></i> Manglares<br>';
+                return div;
+            };
+            legend.addTo(map);
+        }
+        function initializeTable() {
+            table = $('#restrictionsTable').DataTable({
+                data: restrictionsData,
+                columns: [
+                    { 
+                        data: "País/Jurisdicción", 
+                        title: "País",
+                        render: function(data) {
+                            return `<span class="fw-bold">${data}</span>`;
+                        }
+                    },
+                    { 
+                        data: "ID_Restriccion", 
+                        title: "ID Restricción",
+                        render: function(data) {
+                            return `<code class="bg-light">${data}</code>`;
+                        }
+                    },
+                    { 
+                        data: "Normativa aplicable", 
+                        title: "Normativa",
+                        render: function(data, type, row) {
+                            if (row.Enlace_norma && row.Enlace_norma !== "") {
+                                return `<a href="${row.Enlace_norma}" target="_blank" class="text-decoration-none text-primary">${data}</a>`;
+                            }
+                            return data;
+                        }
+                    },
+                    { 
+                        data: "Descripción_restriccion", 
+                        title: "Descripción",
+                        render: function(data) {
+                            return data.length > 100 ? data.substring(0, 100) + '...' : data;
+                        }
+                    },
+                    { 
+                        data: "Tipo_restriccion", 
+                        title: "Tipo",
+                        render: function(data) {
+                            let badgeClass = 'badge-otros';
+                            if (data.includes('Conservación') || data.includes('Área Protegida') || data.includes('ANP') || data.includes('Protegido')) {
+                                badgeClass = 'badge-ap';
+                            } else if (data.includes('Buffer') || data.includes('Protección hídrica') || data.includes('riberas') || data.includes('nacimientos') || data.includes('agua')) {
+                                badgeClass = 'badge-buffer';
+                            } else if (data.includes('Uso del suelo') || data.includes('Tenencia') || data.includes('Ordenamiento')) {
+                                badgeClass = 'badge-success';
+                            }
+                            return `<span class="badge ${badgeClass}">${data}</span>`;
+                        }
+                    },
+                    { 
+                        data: "Pertinencia EUDR", 
+                        title: "Pertinencia EUDR",
+                        render: function(data, type, row) {
+                            let badgeClass = 'bg-secondary';
+                            let text = "Baja";
+                            if (data.includes('clave') || data.includes('directamente') || data.includes('alta') || data.includes('Clave')) {
+                                badgeClass = 'bg-success';
+                                text = "Alta";
+                            } else if (data.includes('media') || data.includes('complementa') || data.includes('soporte')) {
+                                badgeClass = 'bg-warning text-dark';
+                                text = "Media";
+                            }
+                            return `<span class="badge ${badgeClass}">${text}</span>`;
+                        }
+                    },
+                    { 
+                        data: "Nombre de la Capa.1", 
+                        title: "Dataset",
+                        render: function(data, type, row) {
+                            if (!data || data === "") return "<span class='text-muted'>No especificado</span>";
+                            if (row.Enlace_dataset && row.Enlace_dataset !== "") {
+                                return `<a href="${row.Enlace_dataset}" target="_blank" class="text-decoration-none text-info">${data}</a>`;
+                            }
+                            return data;
+                        }
+                    },
+                    { 
+                        data: "Geoproceso a realizar", 
+                        title: "Geoproceso",
+                        render: function(data) {
+                            if (!data || data === "") return "<span class='text-muted'>No especificado</span>";
+                            return data.length > 50 ? data.substring(0, 50) + '...' : data;
+                        }
+                    },
+                    {
+                        data: null,
+                        title: "Acciones",
+                        orderable: false,
+                        render: function(data, type, row) {
+                            return `
+                                <button class="btn btn-sm btn-outline-primary view-detail" data-id="${row.ID_Restriccion}">Ver Detalle</button>
+                                <button class="btn btn-sm btn-outline-success export-row" data-id="${row.ID_Restriccion}">Exportar</button>
+                                <button class="btn btn-sm btn-outline-info view-on-map" data-country="${row["País/Jurisdicción"]}" data-type="${row["Tipo_restriccion"]}">Ver en Mapa</button>
+                            `;
+                        }
+                    }
+                ],
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                },
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50],
+                responsive: true,
+                order: [[0, 'asc']],
+                initComplete: function() {
+                    updateResultsCount();
+                }
+            });
+            // Evento para los botones de detalle después de que se renderiza la tabla
+            $('#restrictionsTable tbody').on('click', '.view-detail', function() {
+                const id = $(this).data('id');
+                showDetailModal(id);
+            });
+            $('#restrictionsTable tbody').on('click', '.export-row', function() {
+                const id = $(this).data('id');
+                exportRow(id);
+            });
+            // Evento para ver en mapa
+            $('#restrictionsTable tbody').on('click', '.view-on-map', function() {
+                const country = $(this).data('country');
+                const type = $(this).data('type');
+                // Cambiar a la pestaña del mapa
+                $('#map-tab').tab('show');
+                // Centrar el mapa en el país
+                let center;
+                if (country === "Belice") {
+                    center = [17.25, -88.75];
+                } else if (country === "Costa Rica") {
+                    center = [9.75, -83.75];
+                } else if (country === "El Salvador") {
+                    center = [13.75, -89.25];
+                } else if (country === "Guatemala") {
+                    center = [15.5, -90.5];
+                }
+                if (center) {
+                    map.setView(center, 9);
+                }
+                // Asegurar que la capa esté activa
+                $('#allRestrictionsLayer').prop('checked', true);
+            });
+        }
+        function populateFilters() {
+            // Cargar opciones de países
+            const countries = [...new Set(restrictionsData.map(item => item["País/Jurisdicción"]))].sort();
+            countries.forEach(country => {
+                $('#countryFilter').append(`<option value="${country}">${country}</option>`);
+            });
+            // Cargar opciones de tipos de restricción
+            const types = [...new Set(restrictionsData.map(item => item["Tipo_restriccion"]))].sort();
+            types.forEach(type => {
+                $('#typeFilter').append(`<option value="${type}">${type}</option>`);
+            });
+        }
+        function setupEventListeners() {
+            // Aplicar filtros
+            $('#applyFilters').click(function() {
+                applyFilters();
+            });
+            // Resetear filtros
+            $('#resetFilters').click(function() {
+                resetFilters();
+            });
+            // Búsqueda en tiempo real
+            $('#searchInput').on('keyup', function() {
+                applyFilters();
+            });
+            // Filtros select
+            $('#countryFilter, #typeFilter, #eudrFilter').on('change', function() {
+                applyFilters();
+            });
+        }
+        function applyFilters() {
+            const countryFilter = $('#countryFilter').val();
+            const typeFilter = $('#typeFilter').val();
+            const eudrFilter = $('#eudrFilter').val();
+            const searchFilter = $('#searchInput').val().toLowerCase();
+            filteredData = restrictionsData.filter(item => {
+                const countryMatch = !countryFilter || item["País/Jurisdicción"] === countryFilter;
+                const typeMatch = !typeFilter || item["Tipo_restriccion"] === typeFilter;
+                const eudrMatch = !eudrFilter || getEudrLevel(item["Pertinencia EUDR"]) === eudrFilter;
+                const searchMatch = !searchFilter || 
+                    item["País/Jurisdicción"].toLowerCase().includes(searchFilter) ||
+                    item["Normativa aplicable"].toLowerCase().includes(searchFilter) ||
+                    item["Descripción_restriccion"].toLowerCase().includes(searchFilter) ||
+                    item["ID_Restriccion"].toLowerCase().includes(searchFilter) ||
+                    item["Tipo_restriccion"].toLowerCase().includes(searchFilter) ||
+                    item["Nombre de la Capa.1"].toLowerCase().includes(searchFilter);
+                return countryMatch && typeMatch && eudrMatch && searchMatch;
+            });
+            // Actualizar la tabla con los datos filtrados
+            table.clear();
+            table.rows.add(filteredData);
+            table.draw();
+            // Actualizar estadísticas y conteo
+            updateStats();
+            updateResultsCount();
+            updateActiveFilters();
+            toggleNoResults();
+        }
+        function resetFilters() {
+            $('#countryFilter').val('');
+            $('#typeFilter').val('');
+            $('#eudrFilter').val('');
+            $('#searchInput').val('');
+            filteredData = [...restrictionsData];
+            table.clear();
+            table.rows.add(filteredData);
+            table.draw();
+            updateStats();
+            updateResultsCount();
+            updateActiveFilters();
+            toggleNoResults();
+        }
+        function getEudrLevel(pertinencia) {
+            if (pertinencia.includes('clave') || pertinencia.includes('directamente') || pertinencia.includes('alta') || pertinencia.includes('Clave')) {
+                return 'Alta';
+            } else if (pertinencia.includes('media') || pertinencia.includes('complementa') || pertinencia.includes('soporte')) {
+                return 'Media';
+            }
+            return 'Baja';
+        }
+        function updateStats() {
+            const total = filteredData.length;
+            const highEudr = filteredData.filter(item => 
+                item["Pertinencia EUDR"].includes('clave') || 
+                item["Pertinencia EUDR"].includes('directamente') || 
+                item["Pertinencia EUDR"].includes('alta') ||
+                item["Pertinencia EUDR"].includes('Clave')
+            ).length;
+            const protectedAreas = filteredData.filter(item => 
+                item["Tipo_restriccion"].includes('Conservación') || 
+                item["Tipo_restriccion"].includes('Área Protegida') || 
+                item["Tipo_restriccion"].includes('ANP') ||
+                item["Tipo_restriccion"].includes('Protegido') ||
+                item["Tipo_restriccion"].includes('AP')
+            ).length;
+            const waterBuffers = filteredData.filter(item => 
+                item["Tipo_restriccion"].includes('Buffer') || 
+                item["Tipo_restriccion"].includes('Protección hídrica') || 
+                item["Tipo_restriccion"].includes('riberas') ||
+                item["Tipo_restriccion"].includes('nacimientos') ||
+                item["Tipo_restriccion"].includes('agua') ||
+                item["Tipo_restriccion"].includes('hidro')
+            ).length;
+            $('#totalRestrictions').text(total);
+            $('#highEudr').text(highEudr);
+            $('#protectedAreas').text(protectedAreas);
+            $('#waterBuffers').text(waterBuffers);
+        }
+        function updateResultsCount() {
+            $('#resultsCount').text(`${filteredData.length} resultados`);
+        }
+        function updateActiveFilters() {
+            const countryFilter = $('#countryFilter').val();
+            const typeFilter = $('#typeFilter').val();
+            const eudrFilter = $('#eudrFilter').val();
+            const searchFilter = $('#searchInput').val();
+            let badgesHtml = '';
+            let hasActiveFilters = false;
+            if (countryFilter) {
+                badgesHtml += `<span class="filter-badge"><i class="fas fa-globe-americas"></i> ${countryFilter} <i class="fas fa-times-circle filter-remove" data-filter="country"></i></span>`;
+                hasActiveFilters = true;
+            }
+            if (typeFilter) {
+                badgesHtml += `<span class="filter-badge"><i class="fas fa-layer-group"></i> ${typeFilter} <i class="fas fa-times-circle filter-remove" data-filter="type"></i></span>`;
+                hasActiveFilters = true;
+            }
+            if (eudrFilter) {
+                badgesHtml += `<span class="filter-badge"><i class="fas fa-leaf"></i> EUDR ${eudrFilter} <i class="fas fa-times-circle filter-remove" data-filter="eudr"></i></span>`;
+                hasActiveFilters = true;
+            }
+            if (searchFilter) {
+                badgesHtml += `<span class="filter-badge"><i class="fas fa-search"></i> "${searchFilter}" <i class="fas fa-times-circle filter-remove" data-filter="search"></i></span>`;
+                hasActiveFilters = true;
+            }
+            $('#filterBadges').html(badgesHtml);
+            $('#activeFilters').toggle(hasActiveFilters);
+            // Evento para remover filtros individuales
+            $('.filter-remove').on('click', function() {
+                const filterType = $(this).data('filter');
+                if (filterType === 'country') $('#countryFilter').val('');
+                if (filterType === 'type') $('#typeFilter').val('');
+                if (filterType === 'eudr') $('#eudrFilter').val('');
+                if (filterType === 'search') $('#searchInput').val('');
+                applyFilters();
+            });
+        }
+        function toggleNoResults() {
+            const hasResults = filteredData.length > 0;
+            $('#noResults').toggle(!hasResults);
+            $('.table-responsive').toggle(hasResults);
+        }
+        function showDetailModal(id) {
+            const item = restrictionsData.find(row => row.ID_Restriccion === id);
+            if (item) {
+                let modalContent = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-balance-scale"></i> Información Legal</h5>
+                            <hr>
+                            <p><strong><i class="fas fa-flag"></i> País:</strong> ${item["País/Jurisdicción"]}</p>
+                            <p><strong><i class="fas fa-id-card"></i> ID Restricción:</strong> <code>${item.ID_Restriccion}</code></p>
+                            <p><strong><i class="fas fa-book"></i> Normativa:</strong> <a href="${item.Enlace_norma}" target="_blank" class="text-decoration-none">${item["Normativa aplicable"]}</a></p>
+                            <p><strong><i class="fas fa-file-alt"></i> Artículo:</strong> ${item.Articulo_norma}</p>
+                            <p><strong><i class="fas fa-calendar-alt"></i> Fecha Norma:</strong> ${item.Fecha_norma}</p>
+                            <p><strong><i class="fas fa-building"></i> Institución Responsable:</strong> ${item["Institución responsable"]}</p>
+                            <p><strong><i class="fas fa-map-marker-alt"></i> Nivel/Escala:</strong> ${item.Nivel_escala}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-tools"></i> Detalles Técnicos</h5>
+                            <hr>
+                            <p><strong><i class="fas fa-layer-group"></i> Tipo de Restricción:</strong> <span class="badge ${getBadgeClass(item["Tipo_restriccion"])}">${item["Tipo_restriccion"]}</span></p>
+                            <p><strong><i class="fas fa-check-circle"></i> Cuantificable:</strong> ${item.Cuantificable}</p>
+                            <p><strong><i class="fas fa-ruler"></i> Parámetros Geográficos:</strong> ${item.Parametros_geo}</p>
+                            <p><strong><i class="fas fa-draw-polygon"></i> Representación:</strong> ${item.Representacion}</p>
+                            <p><strong><i class="fas fa-chart-line"></i> Tipo de Análisis:</strong> ${item["Tipo_Analisis"] || "No especificado"}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5><i class="fas fa-align-left"></i> Descripción de la Restricción</h5>
+                            <hr>
+                            <div class="alert alert-info">${item.Descripción_restriccion}</div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5><i class="fas fa-leaf"></i> Pertinencia EUDR</h5>
+                            <hr>
+                            <div class="alert alert-${getEudrAlertClass(item["Pertinencia EUDR"])}">
+                                ${item["Pertinencia EUDR"]}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5><i class="fas fa-database"></i> Dataset y Geoproceso</h5>
+                            <hr>
+                            <p><strong><i class="fas fa-layer-group"></i> Nombre de la Capa:</strong> ${item["Nombre de la Capa.1"] || "<span class='text-muted'>No especificado</span>"}</p>
+                            <p><strong><i class="fas fa-calendar-day"></i> Fecha del Dataset:</strong> ${item.Fecha_dataset || "<span class='text-muted'>No especificado</span>"}</p>
+                            <p><strong><i class="fas fa-info-circle"></i> Descripción del Dataset:</strong> ${item.Descripcion_dataset || "<span class='text-muted'>No especificado</span>"}</p>
+                            <p><strong><i class="fas fa-building"></i> Proveedor del Dataset:</strong> ${item.Proveedor_dataset || "<span class='text-muted'>No especificado</span>"}</p>
+                            <p><strong><i class="fas fa-globe-americas"></i> Cobertura espacial:</strong> ${item["Cobertura espacial"] || "<span class='text-muted'>No especificado</span>"}</p>
+                            <p><strong><i class="fas fa-link"></i> Fuente:</strong> ${item.Fuente || "<span class='text-muted'>No especificado</span>"}</p>
+                            <p><strong><i class="fas fa-file-contract"></i> Licencia/Condiciones de uso:</strong> ${item["Licencia/Condiciones de uso"] || "<span class='text-muted'>No especificado</span>"}</p>
+                            <p><strong><i class="fas fa-external-link-alt"></i> Enlace al Dataset:</strong> ${item.Enlace_dataset ? `<a href="${item.Enlace_dataset}" target="_blank" class="text-decoration-none">${item.Enlace_dataset}</a>` : "<span class='text-muted'>No especificado</span>"}</p>
+                            <p><strong><i class="fas fa-comment"></i> Observaciones del Dataset:</strong> ${item.Observaciones_dataset || "<span class='text-muted'>No especificado</span>"}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5><i class="fas fa-cogs"></i> Geoproceso a Realizar</h5>
+                            <hr>
+                            <div class="bg-light p-3 rounded">
+                                ${item["Geoproceso a realizar"] || "<span class='text-muted'>No especificado</span>"}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5><i class="fas fa-comments"></i> Observaciones Relevantes</h5>
+                            <hr>
+                            <div class="alert alert-warning">
+                                ${item["Observaciones Relevantes"] || "No hay observaciones"}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <button class="btn btn-primary" onclick="viewOnMap('${item["País/Jurisdicción"]}', '${item["Tipo_restriccion"]}')">
+                                <i class="fas fa-map-marked-alt"></i> Ver esta restricción en el mapa
+                            </button>
+                        </div>
+                    </div>
+                `;
+                $('#modalContent').html(modalContent);
+                $('#detailModalLabel').text(`Detalle de la Restricción: ${item.ID_Restriccion}`);
+                new bootstrap.Modal(document.getElementById('detailModal')).show();
+            }
+        }
+        function viewOnMap(country, type) {
+            // Cerrar el modal
+            bootstrap.Modal.getInstance(document.getElementById('detailModal')).hide();
+            // Cambiar a la pestaña del mapa
+            $('#map-tab').tab('show');
+            // Centrar el mapa en el país
+            let center;
+            if (country === "Belice") {
+                center = [17.25, -88.75];
+            } else if (country === "Costa Rica") {
+                center = [9.75, -83.75];
+            } else if (country === "El Salvador") {
+                center = [13.75, -89.25];
+            } else if (country === "Guatemala") {
+                center = [15.5, -90.5];
+            }
+            if (center) {
+                map.setView(center, 9);
+            }
+            // Asegurar que la capa esté activa
+            $('#allRestrictionsLayer').prop('checked', true);
+        }
+        function getBadgeClass(type) {
+            if (type.includes('Conservación') || type.includes('Área Protegida') || type.includes('ANP') || type.includes('Protegido')) {
+                return 'bg-primary';
+            } else if (type.includes('Buffer') || type.includes('Protección hídrica') || type.includes('riberas') || type.includes('nacimientos') || type.includes('agua')) {
+                return 'bg-danger';
+            } else if (type.includes('Uso del suelo') || type.includes('Tenencia') || type.includes('Ordenamiento')) {
+                return 'bg-success';
+            } else {
+                return 'bg-secondary';
+            }
+        }
+        function getEudrAlertClass(pertinencia) {
+            if (pertinencia.includes('clave') || pertinencia.includes('directamente') || pertinencia.includes('alta') || pertinencia.includes('Clave')) {
+                return 'success';
+            } else if (pertinencia.includes('media') || pertinencia.includes('complementa') || pertinencia.includes('soporte')) {
+                return 'warning';
+            } else {
+                return 'secondary';
+            }
+        }
+        function exportRow(id) {
+            const item = restrictionsData.find(row => row.ID_Restriccion === id);
+            if (item) {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                doc.setFontSize(18);
+                doc.text(`Detalle de Restricción: ${item.ID_Restriccion}`, 14, 22);
+                doc.setFontSize(12);
+                doc.text(`País: ${item["País/Jurisdicción"]}`, 14, 35);
+                doc.text(`Normativa: ${item["Normativa aplicable"]}`, 14, 42);
+                doc.text(`Tipo: ${item["Tipo_restriccion"]}`, 14, 49);
+                doc.setFontSize(11);
+                doc.text("Descripción:", 14, 60);
+                doc.setFontSize(10);
+                const splitDescription = doc.splitTextToSize(item.Descripción_restriccion, 180);
+                doc.text(splitDescription, 14, 65);
+                let currentY = 65 + (splitDescription.length * 5) + 10;
+                doc.setFontSize(11);
+                doc.text("Pertinencia EUDR:", 14, currentY);
+                doc.setFontSize(10);
+                const splitEudr = doc.splitTextToSize(item["Pertinencia EUDR"], 180);
+                doc.text(splitEudr, 14, currentY + 5);
+                currentY = currentY + (splitEudr.length * 5) + 15;
+                doc.setFontSize(11);
+                doc.text("Dataset:", 14, currentY);
+                doc.setFontSize(10);
+                doc.text(`Nombre: ${item["Nombre de la Capa.1"] || "No especificado"}`, 14, currentY + 5);
+                doc.text(`Proveedor: ${item.Proveedor_dataset || "No especificado"}`, 14, currentY + 10);
+                currentY = currentY + 25;
+                doc.setFontSize(11);
+                doc.text("Geoproceso a Realizar:", 14, currentY);
+                doc.setFontSize(10);
+                const splitGeoproceso = doc.splitTextToSize(item["Geoproceso a realizar"] || "No especificado", 180);
+                doc.text(splitGeoproceso, 14, currentY + 5);
+                doc.save(`restriccion_${item.ID_Restriccion}.pdf`);
+            }
+        }
+        // Exportar a Excel
+        $('#exportExcel').click(function() {
+            const wb = XLSX.utils.book_new();
+            const ws_data = [
+                ["País", "ID Restricción", "Normativa", "Descripción", "Tipo", "Pertinencia EUDR", "Dataset", "Geoproceso"]
+            ];
+            filteredData.forEach(row => {
+                ws_data.push([
+                    row["País/Jurisdicción"],
+                    row.ID_Restriccion,
+                    row["Normativa aplicable"],
+                    row.Descripción_restriccion,
+                    row["Tipo_restriccion"],
+                    getEudrLevel(row["Pertinencia EUDR"]),
+                    row["Nombre de la Capa.1"] || "No especificado",
+                    row["Geoproceso a realizar"] || "No especificado"
+                ]);
+            });
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            XLSX.utils.book_append_sheet(wb, ws, "Restricciones");
+            XLSX.writeFile(wb, "restricciones_eudr.xlsx");
+        });
+        // Exportar a PDF
+        $('#exportPDF').click(function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(18);
+            doc.text("Reporte de Restricciones Legales - EUDR", 14, 22);
+            doc.setFontSize(11);
+            doc.text(`Generado el: ${new Date().toLocaleDateString()}`, 14, 30);
+            const tableData = [];
+            filteredData.forEach(row => {
+                tableData.push([
+                    row["País/Jurisdicción"],
+                    row.ID_Restriccion,
+                    row["Normativa aplicable"].substring(0, 30) + (row["Normativa aplicable"].length > 30 ? "..." : ""),
+                    row.Descripción_restriccion.substring(0, 50) + (row.Descripción_restriccion.length > 50 ? "..." : ""),
+                    row["Tipo_restriccion"],
+                    getEudrLevel(row["Pertinencia EUDR"])
+                ]);
+            });
+            doc.autoTable({
+                head: [['País', 'ID Restricción', 'Normativa', 'Descripción', 'Tipo', 'Pertinencia EUDR']],
+                body: tableData,
+                startY: 40,
+                theme: 'grid',
+                headStyles: { fillColor: [40, 100, 200] }
+            });
+            doc.save('restricciones_eudr.pdf');
+        });
+    </script>
+</body>
+</html>
+
+
+    
+              <script>
+                              
+              </script>
+                        </body>
+                        </html>
+                    

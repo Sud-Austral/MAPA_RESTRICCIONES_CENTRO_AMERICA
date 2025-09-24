@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Leaflet + World Reference Overlay (ArcGIS)</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body { margin:0; padding:0; }
+    #map { width:100%; height:100vh; }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <!-- incluir la librería esri-leaflet -->
+  <script src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
+
+  <script>
+    // Crear mapa centrado en algún punto
+    var map = L.map('map').setView([0, 0], 2);
+
+    // Capa base cualquiera; por ejemplo OpenStreetMap
+    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Zona: cargar la capa de Esri: World Reference Overlay
+    var referenceOverlay = L.esri.tiledMapLayer({
+      url: 'https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Reference_Overlay/MapServer',
+      opacity: 1.0
+    }).addTo(map);
+
+    // Opcional: controlar orden / visibilidad
+    // e.g. puede añadirse interfaz para encender/apagar esta capa
+
+  </script>
+</body>
+</html>
