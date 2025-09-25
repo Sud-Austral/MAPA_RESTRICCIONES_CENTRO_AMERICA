@@ -31,7 +31,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"Uso oficial nacional (revisar términos BERDS)",
     "Contacto oficial":"Forest Department de Belice",
     "Enlace_dataset":"https:\/\/www.arcgis.com\/apps\/Viewer\/index.html?appid=e56d47a528f14c38bf6e0309eeefa08b",
-    "Observaciones_dataset":"Fuente nacional principal; puede incluir AP marinas."
+    "Observaciones_dataset":"Fuente nacional principal; puede incluir AP marinas.",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Belice",
@@ -65,7 +67,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"Uso oficial nacional (revisar términos BERDS)",
     "Contacto oficial":"Forest Department de Belice",
     "Enlace_dataset":"https:\/\/www.arcgis.com\/apps\/Viewer\/index.html?appid=e56d47a528f14c38bf6e0309eeefa08b",
-    "Observaciones_dataset":"Fuente nacional principal; puede incluir AP marinas."
+    "Observaciones_dataset":"Fuente nacional principal; puede incluir AP marinas.",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Belice",
@@ -99,7 +103,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"Uso oficial nacional (revisar términos BERDS)",
     "Contacto oficial":"Forest Department de Belice",
     "Enlace_dataset":"https:\/\/www.arcgis.com\/apps\/Viewer\/index.html?appid=e56d47a528f14c38bf6e0309eeefa08b",
-    "Observaciones_dataset":"Fuente nacional principal; puede incluir AP marinas."
+    "Observaciones_dataset":"Fuente nacional principal; puede incluir AP marinas.",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Belice",
@@ -133,7 +139,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"Uso oficial nacional (revisar términos BERDS)",
     "Contacto oficial":"Forest Department de Belice",
     "Enlace_dataset":"https:\/\/www.arcgis.com\/apps\/Viewer\/index.html?appid=e56d47a528f14c38bf6e0309eeefa08b",
-    "Observaciones_dataset":"Fuente nacional principal; puede incluir AP marinas."
+    "Observaciones_dataset":"Fuente nacional principal; puede incluir AP marinas.",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Belice",
@@ -167,7 +175,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"Uso oficial nacional (revisar términos BERDS)",
     "Contacto oficial":"Forest Department de Belice",
     "Enlace_dataset":"https:\/\/www.arcgis.com\/apps\/Viewer\/index.html?appid=e56d47a528f14c38bf6e0309eeefa08b",
-    "Observaciones_dataset":"Fuente nacional principal; puede incluir AP marinas."
+    "Observaciones_dataset":"Fuente nacional principal; puede incluir AP marinas.",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Belice",
@@ -201,7 +211,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"Uso oficial nacional (revisar términos BERDS)",
     "Contacto oficial":"Forest Department de Belice",
     "Enlace_dataset":"https:\/\/www.arcgis.com\/apps\/Viewer\/index.html?appid=e56d47a528f14c38bf6e0309eeefa08b",
-    "Observaciones_dataset":"Fuente nacional principal; puede incluir AP marinas."
+    "Observaciones_dataset":"Fuente nacional principal; puede incluir AP marinas.",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Belice",
@@ -235,7 +247,9 @@ const datos = [
     "Licencia\/Condiciones de uso":null,
     "Contacto oficial":null,
     "Enlace_dataset":null,
-    "Observaciones_dataset":null
+    "Observaciones_dataset":null,
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Belice",
@@ -269,7 +283,9 @@ const datos = [
     "Licencia\/Condiciones de uso":null,
     "Contacto oficial":null,
     "Enlace_dataset":null,
-    "Observaciones_dataset":null
+    "Observaciones_dataset":null,
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Belice",
@@ -303,7 +319,9 @@ const datos = [
     "Licencia\/Condiciones de uso":null,
     "Contacto oficial":null,
     "Enlace_dataset":null,
-    "Observaciones_dataset":null
+    "Observaciones_dataset":null,
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Belice",
@@ -337,7 +355,9 @@ const datos = [
     "Licencia\/Condiciones de uso":null,
     "Contacto oficial":null,
     "Enlace_dataset":null,
-    "Observaciones_dataset":null
+    "Observaciones_dataset":null,
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Belice",
@@ -371,7 +391,9 @@ const datos = [
     "Licencia\/Condiciones de uso":null,
     "Contacto oficial":null,
     "Enlace_dataset":null,
-    "Observaciones_dataset":null
+    "Observaciones_dataset":null,
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Costa Rica",
@@ -405,7 +427,9 @@ const datos = [
     "Licencia\/Condiciones de uso":null,
     "Contacto oficial":null,
     "Enlace_dataset":null,
-    "Observaciones_dataset":null
+    "Observaciones_dataset":null,
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Costa Rica",
@@ -439,7 +463,9 @@ const datos = [
     "Licencia\/Condiciones de uso":null,
     "Contacto oficial":null,
     "Enlace_dataset":null,
-    "Observaciones_dataset":null
+    "Observaciones_dataset":null,
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Costa Rica",
@@ -473,7 +499,9 @@ const datos = [
     "Licencia\/Condiciones de uso":null,
     "Contacto oficial":null,
     "Enlace_dataset":null,
-    "Observaciones_dataset":null
+    "Observaciones_dataset":null,
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Belice",
@@ -507,7 +535,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"Licencia nacional; revisar si para uso público abierto",
     "Contacto oficial":"GSMU \/ Forest Dept.",
     "Enlace_dataset":"Página Web Geospatial Monitoring Unit \/ descarga posibles formatos GIS (Departamento de Bosques de Belice)",
-    "Observaciones_dataset":"Puede requerir procesamientos para alinear sistema de referencia; disponibilidad pública de shapefiles debe confirmarse"
+    "Observaciones_dataset":"Puede requerir procesamientos para alinear sistema de referencia; disponibilidad pública de shapefiles debe confirmarse",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Belice",
@@ -541,7 +571,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"Licencia nacional; revisar si para uso público abierto",
     "Contacto oficial":"GSMU \/ Forest Dept.",
     "Enlace_dataset":"Página Web Geospatial Monitoring Unit \/ descarga posibles formatos GIS (Departamento de Bosques de Belice)",
-    "Observaciones_dataset":"Puede requerir procesamientos para alinear sistema de referencia; disponibilidad pública de shapefiles debe confirmarse"
+    "Observaciones_dataset":"Puede requerir procesamientos para alinear sistema de referencia; disponibilidad pública de shapefiles debe confirmarse",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Belice",
@@ -575,7 +607,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"Licencia oficial gubernamental; verificar condiciones",
     "Contacto oficial":"Fisheries Department, Belice",
     "Enlace_dataset":"https:\/\/fisheries.gov.bz\/resources\/priority-marine-protected-areas-map\/",
-    "Observaciones_dataset":"Usar como fuente principal para reservas marinas; complementa con MAR_MPAs_2021 solo para validación."
+    "Observaciones_dataset":"Usar como fuente principal para reservas marinas; complementa con MAR_MPAs_2021 solo para validación.",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Belice",
@@ -609,7 +643,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"Datos oficiales; sujetos a licencia gubernamental",
     "Contacto oficial":"Forest Department de Belice",
     "Enlace_dataset":"https:\/\/belize-data-defra.opendata.arcgis.com\/datasets\/BLZ::mangrove-permits\/about",
-    "Observaciones_dataset":"Útil para auditoría EUDR; capa dinámica de permisos."
+    "Observaciones_dataset":"Útil para auditoría EUDR; capa dinámica de permisos.",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Belice",
@@ -643,7 +679,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"Uso público con atribución (BNSDI)",
     "Contacto oficial":"Lands & Surveys Department, Belice",
     "Enlace_dataset":"https:\/\/bnsdi.gov.bz\/data-portal\/",
-    "Observaciones_dataset":"No incluye buffer prehecho; debe calcularse en SIG a partir de línea costera\/hidrografía."
+    "Observaciones_dataset":"No incluye buffer prehecho; debe calcularse en SIG a partir de línea costera\/hidrografía.",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Costa Rica",
@@ -677,7 +715,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"?",
     "Enlace_dataset":"https:\/\/www.snitcr.go.cr\/Metadatos\/full_metadata2?k=Y2FwYTo6UkVERCUyQjo6TUMxMw%3D%3D",
-    "Observaciones_dataset":"Último metadato en SNIT corresponde a 2013; versiones recientes (2021–2023) no localizadas con metadato."
+    "Observaciones_dataset":"Último metadato en SNIT corresponde a 2013; versiones recientes (2021–2023) no localizadas con metadato.",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Costa Rica",
@@ -711,7 +751,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"IGN",
     "Enlace_dataset":"https:\/\/www.snitcr.go.cr\/catalogo_metadatos",
-    "Observaciones_dataset":"Existe servicio WMS\/WFS en SNIT, pero sin detalles completos de precisión ni fecha."
+    "Observaciones_dataset":"Existe servicio WMS\/WFS en SNIT, pero sin detalles completos de precisión ni fecha.",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Costa Rica",
@@ -745,7 +787,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"IGN",
     "Enlace_dataset":"https:\/\/www.snitcr.go.cr\/catalogo_metadatos",
-    "Observaciones_dataset":"Existe servicio WMS\/WFS en SNIT, pero sin detalles completos de precisión ni fecha."
+    "Observaciones_dataset":"Existe servicio WMS\/WFS en SNIT, pero sin detalles completos de precisión ni fecha.",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Costa Rica",
@@ -779,7 +823,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"IGN",
     "Enlace_dataset":"https:\/\/www.snitcr.go.cr\/catalogo_metadatos",
-    "Observaciones_dataset":"Existe servicio WMS\/WFS en SNIT, pero sin detalles completos de precisión ni fecha."
+    "Observaciones_dataset":"Existe servicio WMS\/WFS en SNIT, pero sin detalles completos de precisión ni fecha.",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Costa Rica",
@@ -813,7 +859,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"IGN",
     "Enlace_dataset":"https:\/\/www.snitcr.go.cr\/catalogo_metadatos",
-    "Observaciones_dataset":"Existe servicio WMS\/WFS en SNIT, pero sin detalles completos de precisión ni fecha."
+    "Observaciones_dataset":"Existe servicio WMS\/WFS en SNIT, pero sin detalles completos de precisión ni fecha.",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Costa Rica",
@@ -847,7 +895,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"SINAC",
     "Enlace_dataset":"https:\/\/www.snitcr.go.cr\/catalogo_metadatos",
-    "Observaciones_dataset":"Inventario de humedales existe; metadatos en SNIT incompletos (fecha y licencia faltan)."
+    "Observaciones_dataset":"Inventario de humedales existe; metadatos en SNIT incompletos (fecha y licencia faltan).",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Costa Rica",
@@ -881,7 +931,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"?",
     "Enlace_dataset":"?",
-    "Observaciones_dataset":"No encontré metadato en SNIT que lo documente como dataset disponible públicamente."
+    "Observaciones_dataset":"No encontré metadato en SNIT que lo documente como dataset disponible públicamente.",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Costa Rica",
@@ -915,7 +967,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"ICT",
     "Enlace_dataset":"?",
-    "Observaciones_dataset":"No localicé metadato público que confirme capa digital oficial completa de ZMT."
+    "Observaciones_dataset":"No localicé metadato público que confirme capa digital oficial completa de ZMT.",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Costa Rica",
@@ -949,7 +1003,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"Uso público con cita",
     "Contacto oficial":"INTA",
     "Enlace_dataset":"https:\/\/www.snitcr.go.cr\/Metadatos\/full_metadata2?k=Y2FwYTo6SU5UQTo6SU5UQS1NQUdfY2FwVXNvXzUw",
-    "Observaciones_dataset":"Confirmado en metadatos SNIT; escala 1:50 000; shapefile."
+    "Observaciones_dataset":"Confirmado en metadatos SNIT; escala 1:50 000; shapefile.",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Costa Rica",
@@ -983,7 +1039,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"Acceso restringido",
     "Contacto oficial":"Comisión Arqueológica Nacional",
     "Enlace_dataset":"?",
-    "Observaciones_dataset":"No hay repositorio público ni metadato oficial accesible en SNIT."
+    "Observaciones_dataset":"No hay repositorio público ni metadato oficial accesible en SNIT.",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"El Salvador",
@@ -1017,7 +1075,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"CENTA",
     "Enlace_dataset":"https:\/\/www.centa.gob.sv\/mapa-digital-de-suelos\/",
-    "Observaciones_dataset":"Confirmar disponibilidad en shapefile con clasificación legal VI–VIII"
+    "Observaciones_dataset":"Confirmar disponibilidad en shapefile con clasificación legal VI–VIII",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"El Salvador",
@@ -1051,7 +1111,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"OPAMSS",
     "Enlace_dataset":"https:\/\/geovisor.opamss.org.sv\/portal\/home\/item.html?id=c6036342198240d89df8eb9b1f84082f",
-    "Observaciones_dataset":"Cobertura parcial (solo AMSS)"
+    "Observaciones_dataset":"Cobertura parcial (solo AMSS)",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"El Salvador",
@@ -1085,7 +1147,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"Proyecto Mesoamérica",
     "Enlace_dataset":"http:\/\/rmgir.proyectomesoamerica.org\/server\/rest\/services\/RMGIR\/ElSalvadorDatosBasicos\/MapServer\/0",
-    "Observaciones_dataset":"No incluye nacimientos puntuales"
+    "Observaciones_dataset":"No incluye nacimientos puntuales",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"El Salvador",
@@ -1119,7 +1183,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"Proyecto Mesoamérica",
     "Enlace_dataset":"http:\/\/rmgir.proyectomesoamerica.org\/server\/rest\/services\/RMGIR\/ElSalvadorDatosBasicos\/MapServer\/1",
-    "Observaciones_dataset":"No especifica línea de máxima crecida"
+    "Observaciones_dataset":"No especifica línea de máxima crecida",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Costa Rica",
@@ -1153,7 +1219,9 @@ const datos = [
     "Licencia\/Condiciones de uso":null,
     "Contacto oficial":null,
     "Enlace_dataset":null,
-    "Observaciones_dataset":null
+    "Observaciones_dataset":null,
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Costa Rica",
@@ -1187,7 +1255,9 @@ const datos = [
     "Licencia\/Condiciones de uso":null,
     "Contacto oficial":null,
     "Enlace_dataset":null,
-    "Observaciones_dataset":null
+    "Observaciones_dataset":null,
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"El Salvador",
@@ -1221,7 +1291,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"CC BY",
     "Contacto oficial":"GFW",
     "Enlace_dataset":"https:\/\/data.globalforestwatch.org\/",
-    "Observaciones_dataset":"Definir umbrales de % cobertura arbórea"
+    "Observaciones_dataset":"Definir umbrales de % cobertura arbórea",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Costa Rica",
@@ -1255,7 +1327,9 @@ const datos = [
     "Licencia\/Condiciones de uso":null,
     "Contacto oficial":null,
     "Enlace_dataset":null,
-    "Observaciones_dataset":null
+    "Observaciones_dataset":null,
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"El Salvador",
@@ -1289,7 +1363,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"MARN",
     "Enlace_dataset":"http:\/\/rmgir.proyectomesoamerica.org\/server\/rest\/services\/RMGIR\/ElSalvadorDatosBasicos\/MapServer\/19",
-    "Observaciones_dataset":"No incluye polígonos de amortiguamiento"
+    "Observaciones_dataset":"No incluye polígonos de amortiguamiento",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"El Salvador",
@@ -1323,7 +1399,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"MARN",
     "Enlace_dataset":"http:\/\/rmgir.proyectomesoamerica.org\/server\/rest\/services\/RMGIR\/ElSalvadorDatosBasicos\/MapServer\/19",
-    "Observaciones_dataset":"No incluye polígonos de amortiguamiento"
+    "Observaciones_dataset":"No incluye polígonos de amortiguamiento",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"El Salvador",
@@ -1357,7 +1435,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"Proyecto Mesoamérica",
     "Enlace_dataset":"http:\/\/rmgir.proyectomesoamerica.org\/server\/rest\/services\/RMGIR\/ElSalvadorDatosBasicos\/MapServer\/2",
-    "Observaciones_dataset":"Útil como marco hidrológico"
+    "Observaciones_dataset":"Útil como marco hidrológico",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"El Salvador",
@@ -1391,7 +1471,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"MARN",
     "Enlace_dataset":"https:\/\/mapas.marn.gob.sv\/vigea\/nepamap.aspx",
-    "Observaciones_dataset":"Nopermite descargar shapefiles"
+    "Observaciones_dataset":"Nopermite descargar shapefiles",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"El Salvador",
@@ -1425,7 +1507,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"MARN",
     "Enlace_dataset":"http:\/\/rmgir.proyectomesoamerica.org\/server\/rest\/services\/RMGIR\/ElSalvadorDatosBasicos\/MapServer\/19",
-    "Observaciones_dataset":"No incluye polígonos de amortiguamiento"
+    "Observaciones_dataset":"No incluye polígonos de amortiguamiento",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Guatemala",
@@ -1459,7 +1543,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"SEGEPLAN",
     "Enlace_dataset":"https:\/\/ideg.segeplan.gob.gt\/geoportal\/",
-    "Observaciones_dataset":"No incluye directamente el buffer → debe generarse en SIG"
+    "Observaciones_dataset":"No incluye directamente el buffer → debe generarse en SIG",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Guatemala",
@@ -1493,7 +1579,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"SEGEPLAN",
     "Enlace_dataset":"https:\/\/ideg.segeplan.gob.gt\/geoportal\/",
-    "Observaciones_dataset":"Requiere identificar ríos navegables y nacimientos de agua"
+    "Observaciones_dataset":"Requiere identificar ríos navegables y nacimientos de agua",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Guatemala",
@@ -1527,7 +1615,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"SEGEPLAN",
     "Enlace_dataset":"https:\/\/ideg.segeplan.gob.gt\/geoportal\/",
-    "Observaciones_dataset":"Requiere identificar ríos navegables y nacimientos de agua"
+    "Observaciones_dataset":"Requiere identificar ríos navegables y nacimientos de agua",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Guatemala",
@@ -1561,7 +1651,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"SEGEPLAN",
     "Enlace_dataset":"https:\/\/ideg.segeplan.gob.gt\/geoportal\/",
-    "Observaciones_dataset":"Requiere identificar ríos navegables y nacimientos de agua"
+    "Observaciones_dataset":"Requiere identificar ríos navegables y nacimientos de agua",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"El Salvador",
@@ -1595,7 +1687,9 @@ const datos = [
     "Licencia\/Condiciones de uso":null,
     "Contacto oficial":null,
     "Enlace_dataset":null,
-    "Observaciones_dataset":null
+    "Observaciones_dataset":null,
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Guatemala",
@@ -1629,7 +1723,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"CONAP",
     "Enlace_dataset":"https:\/\/conap.gob.gt\/direccion-de-analisis-geoespacial\/",
-    "Observaciones_dataset":"Capa oficial, sustituye necesidad de WDPA"
+    "Observaciones_dataset":"Capa oficial, sustituye necesidad de WDPA",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"El Salvador",
@@ -1663,7 +1759,9 @@ const datos = [
     "Licencia\/Condiciones de uso":null,
     "Contacto oficial":null,
     "Enlace_dataset":null,
-    "Observaciones_dataset":null
+    "Observaciones_dataset":null,
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Guatemala",
@@ -1697,7 +1795,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"CC-BY?",
     "Contacto oficial":"CEPAL",
     "Enlace_dataset":"https:\/\/geoportal.cepal.org\/catalogue\/#\/dataset\/470",
-    "Observaciones_dataset":"Dataset oficial CEPAL; usar como respaldo si no hay capa nacional de INAB\/CONAP"
+    "Observaciones_dataset":"Dataset oficial CEPAL; usar como respaldo si no hay capa nacional de INAB\/CONAP",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Guatemala",
@@ -1731,7 +1831,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"INAB",
     "Enlace_dataset":"https:\/\/www.sifgua.org.gt\/SIFGUAData\/PaginasEstadisticas\/Recursos-forestales\/Cobertura.aspx",
-    "Observaciones_dataset":"Tiene múltiples cortes temporales (1991–2020); útil para trazabilidad EUDR"
+    "Observaciones_dataset":"Tiene múltiples cortes temporales (1991–2020); útil para trazabilidad EUDR",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"El Salvador",
@@ -1765,7 +1867,9 @@ const datos = [
     "Licencia\/Condiciones de uso":null,
     "Contacto oficial":null,
     "Enlace_dataset":null,
-    "Observaciones_dataset":null
+    "Observaciones_dataset":null,
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Guatemala",
@@ -1799,7 +1903,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"INAB",
     "Enlace_dataset":"https:\/\/www.sifgua.org.gt\/SIFGUAData\/PaginasEstadisticas\/Recursos-forestales\/Cobertura.aspx",
-    "Observaciones_dataset":"Tiene múltiples cortes temporales (1991–2020); útil para trazabilidad EUDR"
+    "Observaciones_dataset":"Tiene múltiples cortes temporales (1991–2020); útil para trazabilidad EUDR",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Guatemala",
@@ -1833,7 +1939,9 @@ const datos = [
     "Licencia\/Condiciones de uso":null,
     "Contacto oficial":null,
     "Enlace_dataset":null,
-    "Observaciones_dataset":null
+    "Observaciones_dataset":null,
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Guatemala",
@@ -1867,7 +1975,9 @@ const datos = [
     "Licencia\/Condiciones de uso":null,
     "Contacto oficial":null,
     "Enlace_dataset":null,
-    "Observaciones_dataset":null
+    "Observaciones_dataset":null,
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Guatemala",
@@ -1901,7 +2011,9 @@ const datos = [
     "Licencia\/Condiciones de uso":null,
     "Contacto oficial":null,
     "Enlace_dataset":null,
-    "Observaciones_dataset":null
+    "Observaciones_dataset":null,
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Guatemala",
@@ -1935,7 +2047,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"SEGEPLAN",
     "Enlace_dataset":"https:\/\/ideg.segeplan.gob.gt\/geoportal\/",
-    "Observaciones_dataset":"Requiere identificar ríos navegables y nacimientos de agua"
+    "Observaciones_dataset":"Requiere identificar ríos navegables y nacimientos de agua",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Guatemala",
@@ -1969,7 +2083,9 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"Proyecto Mesoamérica",
     "Enlace_dataset":"http:\/\/rmgir.proyectomesoamerica.org\/server\/rest\/services\/RMGIR\/Guatemala_Fen%C3%B3menos_Geol%C3%B3gicos_WGS1984\/MapServer\/18",
-    "Observaciones_dataset":"Se debe intersectar con un DEM para delimitar zonas ≤30% pendiente"
+    "Observaciones_dataset":"Se debe intersectar con un DEM para delimitar zonas ≤30% pendiente",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   },
   {
     "País\/Jurisdicción":"Guatemala",
@@ -2003,6 +2119,8 @@ const datos = [
     "Licencia\/Condiciones de uso":"?",
     "Contacto oficial":"INAB",
     "Enlace_dataset":"https:\/\/www.sifgua.org.gt\/SIFGUAData\/PaginasEstadisticas\/Recursos-forestales\/Cobertura.aspx",
-    "Observaciones_dataset":"Tiene múltiples cortes temporales (1991–2020); útil para trazabilidad EUDR"
+    "Observaciones_dataset":"Tiene múltiples cortes temporales (1991–2020); útil para trazabilidad EUDR",
+    "mapa":null,
+    "enlace":"https:\/\/sud-austral.github.io\/MAPA_RESTRICCIONES_CENTRO_AMERICA\/mapa2.html"
   }
 ]

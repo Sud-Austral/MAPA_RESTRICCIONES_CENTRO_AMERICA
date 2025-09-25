@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot - Áreas Protegidas de Belice</title>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-leaf"></i> Información geoespacial para el cumplimiento del Reglamento Europeo sobre Productos Libres de Deforestación (EUDR)</h1>
+            <p>Consulta información sobre restricciones, geoprocesos y regulaciones ambientales</p>
+        </div>
+        <div class="chat-container" id="chat-container">
+            <div class="message bot-message">
+                <div class="message-wrapper">
+                    <div class="bot-avatar">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <div>
+                        <div class="message-content">
+                            ¡Hola! 🌿 Soy tu asistente especializado en áreas protegidas. Puedes preguntarme sobre restricciones, geoprocesos o cualquier aspecto relacionado con los datos disponibles. ¿En qué puedo ayudarte hoy?
+                        </div>
+                        <div class="timestamp">Hoy, 10:30 AM</div>
+                        <div class="suggested-questions" id="initial-questions">
+                            <button class="suggested-question">¿Qué áreas protegidas existen en Belice?</button>
+                            <button class="suggested-question">¿Cuáles son las restricciones principales?</button>
+                            <button class="suggested-question">¿Cómo se aplican los geoprocesos?</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="typing-indicator" id="typing-indicator">
+            <i class="fas fa-robot"></i> Escribiendo respuesta...
+        </div>
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Escribe tu pregunta aquí..." />
+            <button id="send-button" aria-label="Enviar mensaje">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+        <div class="footer">
+            <i class="fas fa-shield-alt"></i> Asistente de Consultas - Áreas Protegidas de Belice © 2024
+        </div>
+    </div>
+
+    <script src="db.js"></script>
+    <script>
+        // Configuración de la API de Gemini
+        const apiKey = '';
+        const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey;
+        // Historial de la conversación
+        let historialConversacion = [];
+
+        // Elementos del DOM
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const typingIndicator = document.getElementById('typing-indicator');
+
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Prevenir zoom en iOS cuando se enfoca el input
+        userInput.addEventListener('touchstart', function() {
+            userInput.style.fontSize = '16px';
+        });
+
+        // Añadir event listeners a las preguntas iniciales
+        document.addEventListener('DOMContentLoaded', function() {
+            const initialQuestions = document.querySelectorAll('#initial-questions .suggested-question');
+            initialQuestions.forEach(question => {
+                question.addEventListener('click', function() {
+                    userInput.value = this.textContent;
+                    sendMessage();
+                });
+            });
+        });
+
+        // Función para enviar mensajes
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (message === '') return;
+
+            // Deshabilitar botón y input durante el envío
+            sendButton.disabled = true;
+            userInput.disabled = true;
+
+            // Agregar mensaje del usuario al chat
+            addMessageToChat('user', message);
+            userInput.value = '';
+
+            // Mostrar indicador de escritura
+            typingIndicator.classList.add('active');
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            // Obtener respuesta del bot
+            const response = await obtenerRespuesta(message);
+
+            // Ocultar indicador de escritura
+            typingIndicator.classList.remove('active');
+
+            // Agregar respuesta del bot al chat
+            addMessageToChat('bot', response.respuesta, response.preguntas);
+
+            // Rehabilitar botón y input
+            sendButton.disabled = false;
+            userInput.disabled = false;
+            userInput.focus();
+        }
+
+        // Función para agregar mensajes al chat
+        function addMessageToChat(sender, message, preguntas = []) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+
+            const messageWrapper = document.createElement('div');
+            messageWrapper.classList.add('message-wrapper');
+
+            // Crear avatar
+            const avatar = document.createElement('div');
+            avatar.classList.add(sender === 'user' ? 'user-avatar' : 'bot-avatar');
+            avatar.innerHTML = sender === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-leaf"></i>';
+
+            // Crear contenido del mensaje
+            const messageContent = document.createElement('div');
+            messageContent.classList.add('message-content');
+            messageContent.innerHTML = formatMessage(message);
+
+            // Crear timestamp
+            const timestamp = document.createElement('div');
+            timestamp.classList.add('timestamp');
+            const now = new Date();
+            timestamp.textContent = `Hoy, ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+            // Estructurar el mensaje
+            const messageInfo = document.createElement('div');
+            messageInfo.appendChild(messageContent);
+            messageInfo.appendChild(timestamp);
+
+            if (sender === 'user') {
+                messageWrapper.appendChild(messageInfo);
+                messageWrapper.appendChild(avatar);
+            } else {
+                messageWrapper.appendChild(avatar);
+                messageWrapper.appendChild(messageInfo);
+                
+                // Agregar preguntas sugeridas para respuestas del bot
+                if (preguntas.length > 0) {
+                    const suggestedQuestions = document.createElement('div');
+                    suggestedQuestions.classList.add('suggested-questions');
+                    
+                    preguntas.forEach(question => {
+                        const button = document.createElement('button');
+                        button.classList.add('suggested-question');
+                        button.textContent = question;
+                        button.addEventListener('click', function() {
+                            userInput.value = question;
+                            sendMessage();
+                        });
+                        suggestedQuestions.appendChild(button);
+                    });
+                    
+                    messageInfo.appendChild(suggestedQuestions);
+                }
+            }
+
+            messageDiv.appendChild(messageWrapper);
+            chatContainer.appendChild(messageDiv);
+
+            // Scroll al final del chat con animación suave
+            setTimeout(() => {
+                chatContainer.scrollTo({
+                    top: chatContainer.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }, 100);
+        }
+
+        // Función para formatear mensajes (admite markdown básico)
+        function formatMessage(message) {
+            return message
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+        }
+
+        // Función para escapar caracteres especiales en HTML
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Función para agregar enlaces a la respuesta basada en los datos
+        function agregarEnlacesARespuesta(respuesta) {
+            if (typeof respuesta !== 'string') return respuesta;
+            
+            // Filtramos datos que tienen enlace y nombre, y ordenamos por longitud del nombre descendente
+            const datosConEnlace = datos.filter(dato => dato.enlace && dato.nombre);
+            const datosOrdenados = datosConEnlace.sort((a, b) => b.nombre.length - a.nombre.length);
+            
+            for (const dato of datosOrdenados) {
+                const nombre = dato.nombre;
+                // Escapamos el nombre para regex
+                const nombreEscapado = nombre.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                // Creamos la regex para buscar el nombre como palabra completa
+                const regex = new RegExp(`\\b${nombreEscapado}\\b`, 'gi');
+                // Reemplazamos
+                respuesta = respuesta.replace(regex, `<a href="${escapeHtml(dato.enlace)}" target="_blank">${escapeHtml(nombre)}</a>`);
+            }
+            return respuesta;
+        }
+
+        // Función para obtener respuesta de la API de Gemini
+        async function obtenerRespuesta(pregunta) {
+            // Agregar la pregunta del usuario al historial
+            historialConversacion.push({
+                role: "user",
+                parts: [{ text: pregunta }]
+            });
+
+            // Crear el prompt con la base de datos y la pregunta
+            const promptBase = `Eres un asistente experto en áreas protegidas y regulaciones ambientales.
+            Tu función es responder preguntas basándote exclusivamente en la siguiente base de datos:
+
+            ${JSON.stringify(datos)}
+
+            Instrucciones:
+            1. Responde de manera clara, concisa y amigable.
+            2. Si la información para responder la pregunta está en la base de datos, úsala.
+            3. Si la información no está en la base de datos, indica amablemente que no tienes esa información específica.
+            4. Mantén un tono profesional pero accesible y usa emojis ocasionalmente.
+            5. No inventes información que no esté en la base de datos.
+            6. Puedes hacer referencia a los IDs de restricción o datos cuando sea relevante.
+            7. Usa formato de texto enriquecido cuando sea apropiado (**negrita**, *cursiva*).
+            8. Cuando menciones un área protegida o dato específico que tenga un enlace, incluye su nombre exactamente como aparece en la base de datos para que pueda ser identificado como enlace.
+            9. Después de tu respuesta, genera exactamente 3 preguntas de seguimiento que el usuario podría hacer para profundizar en el tema. Estas preguntas deben estar basadas en la conversación actual y en la información proporcionada.
+
+            Formato de respuesta:
+            [RESPUESTA]
+            ...tu respuesta aquí...
+            [/RESPUESTA]
+
+            [PREGUNTAS]
+            1. Primera pregunta de seguimiento
+            2. Segunda pregunta de seguimiento
+            3. Tercera pregunta de seguimiento
+            [/PREGUNTAS]
+
+            Pregunta del usuario: ${pregunta}`;
+
+            // Preparar contenidos para Gemini
+            const contenidos = [
+                {
+                    role: "user",
+                    parts: [{ text: promptBase }]
+                }
+            ];
+
+            // Agregar historial de conversación (máximo últimas 10 interacciones)
+            const historialReciente = historialConversacion.slice(-10);
+            contenidos.push(...historialReciente);
+
+            const requestBody = {
+                contents: contenidos,
+                generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: 3000, // Aumentado para evitar respuestas cortadas
+                }
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error en la petición: ${response.status} ${response.statusText}`);
+                }
+
+                const dataResp = await response.json();
+
+                // Manejo seguro de la respuesta
+                if (dataResp?.candidates?.[0]?.content?.parts?.[0]?.text) {
+                    const respuestaCompleta = dataResp.candidates[0].content.parts[0].text.trim();
+                    
+                    // Extraer la respuesta principal y las preguntas
+                    let respuestaPrincipal = "";
+                    let preguntasSeguimiento = [];
+                    
+                    // Parsear la respuesta - manejo robusto de etiquetas
+                    const respuestaMatch = respuestaCompleta.match(/\[RESPUESTA\]([\s\S]*?)\[\/RESPUESTA\]/i);
+                    if (respuestaMatch && respuestaMatch[1]) {
+                        respuestaPrincipal = respuestaMatch[1].trim();
+                    } else {
+                        // Si no se encuentra el formato, buscar sin etiqueta de cierre
+                        const respuestaSinCierre = respuestaCompleta.match(/\[RESPUESTA\]([\s\S]*?)(?=\[PREGUNTAS\]|$)/i);
+                        if (respuestaSinCierre && respuestaSinCierre[1]) {
+                            respuestaPrincipal = respuestaSinCierre[1].trim();
+                        } else {
+                            // Si no se encuentra, quitar cualquier etiqueta y mostrar todo
+                            respuestaPrincipal = respuestaCompleta.replace(/\[\/?RESPUESTA\]/gi, '').trim();
+                        }
+                    }
+                    
+                    const preguntasMatch = respuestaCompleta.match(/\[PREGUNTAS\]([\s\S]*?)\[\/PREGUNTAS\]/i);
+                    if (preguntasMatch && preguntasMatch[1]) {
+                        // Extraer las preguntas numeradas
+                        const lineas = preguntasMatch[1].split('\n');
+                        for (const linea of lineas) {
+                            const match = linea.match(/^\d+\.\s*(.+)$/);
+                            if (match && match[1]) {
+                                preguntasSeguimiento.push(match[1].trim());
+                            }
+                        }
+                        
+                        // Si no se extrajeron suficientes preguntas, generar algunas genéricas
+                        if (preguntasSeguimiento.length < 3) {
+                            const preguntasGenericas = [
+                                "¿Puedes darme más detalles sobre este tema?",
+                                "¿Cómo se relaciona esto con otras áreas protegidas?",
+                                "Qué implicaciones tiene esto para el cumplimiento del EUDR?"
+                            ];
+                            
+                            while (preguntasSeguimiento.length < 3) {
+                                preguntasSeguimiento.push(preguntasGenericas[preguntasSeguimiento.length]);
+                            }
+                        }
+                    } else {
+                        // Si no se encuentran preguntas, generar algunas genéricas
+                        preguntasSeguimiento = [
+                            "¿Puedes darme más detalles sobre este tema?",
+                            "¿Cómo se relaciona esto con otras áreas protegidas?",
+                            "Qué implicaciones tiene esto para el cumplimiento del EUDR?"
+                        ];
+                    }
+                    
+                    // Agregamos los enlaces a la respuesta principal
+                    respuestaPrincipal = agregarEnlacesARespuesta(respuestaPrincipal);
+                    
+                    // Agregar la respuesta del modelo al historial (solo la respuesta principal)
+                    historialConversacion.push({
+                        role: "model",
+                        parts: [{ text: respuestaPrincipal }]
+                    });
+
+                    return {
+                        respuesta: respuestaPrincipal,
+                        preguntas: preguntasSeguimiento
+                    };
+                } else {
+                    throw new Error("Respuesta inesperada de la API de Gemini");
+                }
+            } catch (error) {
+                console.error("Error al llamar a la API de Gemini:", error);
+                return {
+                    respuesta: "Lo siento, ocurrió un error al procesar tu pregunta. 😔 Por favor, intenta nuevamente más tarde o verifica tu conexión a internet.",
+                    preguntas: [
+                        "¿Qué áreas protegidas existen en Belice?",
+                        "¿Cuáles son las restricciones principales?",
+                        "¿Cómo se aplican los geoprocesos?"
+                    ]
+                };
+            }
+        }
+
+        // Función para limpiar el historial
+        function limpiarHistorial() {
+            historialConversacion = [];
+            localStorage.removeItem('chatHistory');
+        }
+
+        // Auto-focus en el input al cargar la página
+        window.addEventListener('load', () => {
+            userInput.focus();
+        });
+
+        // Manejar cambios de orientación en dispositivos móviles
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 300);
+        });
+    </script>
+</body>
+</html>
