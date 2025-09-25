@@ -18,5 +18,6 @@ function recuperar(ofuscado) {
 const apiKeyReal = "1sXGS3BKZJMXb[KTMJZmOuIvWXVDebTZBzTb{JB";
 
 // Configuración de la API de Gemini
+//const apiKey = "AIzaSyDP2Hav5sNMGqqQqBnM49mzCTI2nptxec8"  //
 const apiKey = recuperar(apiKeyReal);
 const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey;
