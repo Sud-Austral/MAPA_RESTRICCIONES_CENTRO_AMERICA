@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Chatbot - Áreas Protegidas de Belice</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -20,7 +20,6 @@
             --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             --shadow-hover: 0 5px 15px rgba(0, 0, 0, 0.2);
             --radius: 12px;
-            /* Aumentamos el tamaño de fuente base */
             font-size: 18px;
         }
 
@@ -43,10 +42,9 @@
             margin: 0;
             position: relative;
             overflow-x: hidden;
-            font-size: 18px; /* Aumentamos el tamaño de fuente general */
+            font-size: 18px;
         }
 
-        /* Fondo animado */
         body::before {
             content: '';
             position: fixed;
@@ -143,7 +141,7 @@
             flex-direction: column;
             gap: 20px;
             position: relative;
-            font-size: 18px; /* Aumentamos el tamaño de fuente */
+            font-size: 18px;
         }
 
         .message {
@@ -179,8 +177,10 @@
             word-wrap: break-word;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
-            font-size: 18px; /* Aumentamos el tamaño de fuente */
+            font-size: 18px;
             line-height: 1.5;
+            display: flex;
+            flex-direction: column;
         }
 
         .message-content:hover {
@@ -230,9 +230,10 @@
             border: 2px solid var(--divider);
             border-radius: 25px;
             outline: none;
-            font-size: 16px; /* Aumentamos el tamaño de fuente */
+            font-size: 16px;
             transition: all 0.3s ease;
             background: white;
+            max-width: 1000px;
         }
 
         #user-input:focus {
@@ -263,6 +264,12 @@
 
         #send-button:active {
             transform: scale(0.95);
+        }
+
+        #send-button.loading {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
         }
 
         .typing-indicator {
@@ -349,7 +356,51 @@
             border-top: 1px solid var(--divider);
         }
 
-        /* Mejoras para dispositivos móviles */
+        .connection-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--secondary-color);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            z-index: 10;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #f44336;
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        .copy-btn {
+            background: rgba(255,255,255,0.3);
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            margin-left: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .message-content:hover .copy-btn {
+            opacity: 1;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 5px;
@@ -381,7 +432,7 @@
             .message-content {
                 max-width: 85%;
                 padding: 12px 16px;
-                font-size: 16px; /* Aumentamos el tamaño de fuente */
+                font-size: 16px;
             }
             
             .bot-avatar, .user-avatar {
@@ -403,12 +454,23 @@
             
             #user-input {
                 padding: 12px 16px;
-                font-size: 16px; /* Evita zoom en iOS */
+                font-size: 16px;
             }
             
             #send-button {
                 width: 45px;
                 height: 45px;
+            }
+            
+            .suggested-questions {
+                margin-left: 44px;
+                flex-direction: column;
+            }
+            
+            .suggested-question {
+                flex: 1 1 100%;
+                min-width: auto;
+                font-size: 14px;
             }
         }
 
@@ -424,7 +486,7 @@
             .message-content {
                 max-width: 90%;
                 padding: 10px 14px;
-                font-size: 15px; /* Aumentamos el tamaño de fuente */
+                font-size: 15px;
             }
             
             .bot-avatar, .user-avatar {
@@ -434,7 +496,7 @@
             
             #user-input {
                 padding: 10px 14px;
-                font-size: 15px; /* Aumentamos el tamaño de fuente */
+                font-size: 16px;
             }
             
             #send-button {
@@ -443,7 +505,6 @@
             }
         }
 
-        /* Mejoras para tablets */
         @media (min-width: 769px) and (max-width: 1024px) {
             .container {
                 max-width: 700px;
@@ -452,22 +513,20 @@
             
             .message-content {
                 max-width: 70%;
-                font-size: 17px; /* Aumentamos el tamaño de fuente */
+                font-size: 17px;
             }
         }
 
-        /* Mejoras para pantallas grandes */
         @media (min-width: 1200px) {
             .container {
                 max-width: 1000px;
             }
             
             .message-content {
-                font-size: 19px; /* Aumentamos el tamaño de fuente */
+                font-size: 19px;
             }
         }
 
-        /* Scrollbar styling mejorado */
         .chat-container::-webkit-scrollbar {
             width: 8px;
         }
@@ -487,7 +546,6 @@
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
         }
 
-        /* Efectos de entrada para el contenedor */
         .container {
             animation: slideInUp 0.6s ease-out;
         }
@@ -503,7 +561,6 @@
             }
         }
 
-        /* Mejoras de accesibilidad */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
@@ -512,7 +569,6 @@
             }
         }
 
-        /* Dark mode support */
         @media (prefers-color-scheme: dark) {
             :root {
                 --background: #1a1a1a;
@@ -536,7 +592,6 @@
             }
         }
 
-        /* Mejoras para orientación landscape en móviles */
         @media (max-height: 500px) and (orientation: landscape) {
             .container {
                 height: 95vh;
@@ -559,7 +614,6 @@
             }
         }
 
-        /* Estilos para las preguntas sugeridas */
         .suggested-questions {
             display: flex;
             flex-wrap: wrap;
@@ -575,7 +629,7 @@
             padding: 8px 14px;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 15px; /* Aumentamos el tamaño de fuente */
+            font-size: 15px;
             transition: all 0.2s ease;
             outline: none;
             text-align: center;
@@ -594,21 +648,11 @@
             transform: scale(0.95);
         }
 
-        /* Para dispositivos móviles */
-        @media (max-width: 768px) {
-            .suggested-questions {
-                margin-left: 44px;
-                flex-direction: column;
-            }
-            
-            .suggested-question {
-                flex: 1 1 100%;
-                min-width: auto;
-                font-size: 14px; /* Aumentamos el tamaño de fuente */
-            }
+        .suggested-question:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
         }
 
-        /* Estilos para enlaces en mensajes del bot */
         .bot-message .message-content a {
             color: var(--primary-color);
             text-decoration: none;
@@ -625,6 +669,9 @@
 </head>
 <body>
     <div class="container">
+        <div class="connection-status" id="connection-status">
+            <i class="fas fa-wifi"></i> Conectado
+        </div>
         <div class="header">
             <h1><i class="fas fa-leaf"></i> Información geoespacial para el cumplimiento del Reglamento Europeo sobre Productos Libres de Deforestación (EUDR)</h1>
             <p>Consulta información sobre restricciones, geoprocesos y regulaciones ambientales</p>
@@ -653,8 +700,8 @@
             <i class="fas fa-robot"></i> Escribiendo respuesta...
         </div>
         <div class="input-container">
-            <input type="text" id="user-input" placeholder="Escribe tu pregunta aquí..." />
-            <button id="send-button" aria-label="Enviar mensaje">
+            <input type="text" id="user-input" placeholder="Escribe tu pregunta aquí..." aria-label="Escribe tu pregunta" autocomplete="off" maxlength="1000" />
+            <button id="send-button" aria-label="Enviar mensaje" title="Enviar mensaje">
                 <i class="fas fa-paper-plane"></i>
             </button>
         </div>
@@ -668,18 +715,29 @@
     <script>
         // Historial de la conversación
         let historialConversacion = [];
+        let chatHistory = [];
+        let lastMessageTime = 0;
+        const MIN_MESSAGE_INTERVAL = 1000;
+        const MAX_MESSAGE_LENGTH = 1000;
 
         // Elementos del DOM
         const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
         const sendButton = document.getElementById('send-button');
         const typingIndicator = document.getElementById('typing-indicator');
+        const connectionStatus = document.getElementById('connection-status');
 
         // Event listeners
         sendButton.addEventListener('click', sendMessage);
         userInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 sendMessage();
+            }
+        });
+
+        userInput.addEventListener('input', function() {
+            if (this.value.length > MAX_MESSAGE_LENGTH) {
+                this.value = this.value.substring(0, MAX_MESSAGE_LENGTH);
             }
         });
 
@@ -697,38 +755,73 @@
                     sendMessage();
                 });
             });
+            
+            // Auto-focus en el input al cargar la página
+            userInput.focus();
         });
+
+        // Función para sanitizar input
+        function sanitizeInput(input) {
+            const div = document.createElement('div');
+            div.textContent = input;
+            return div.innerHTML;
+        }
 
         // Función para enviar mensajes
         async function sendMessage() {
-            const message = userInput.value.trim();
+            const now = Date.now();
+            if (now - lastMessageTime < MIN_MESSAGE_INTERVAL) {
+                return; // Prevent spam
+            }
+            lastMessageTime = now;
+
+            const message = sanitizeInput(userInput.value.trim());
             if (message === '') return;
 
             // Deshabilitar botón y input durante el envío
             sendButton.disabled = true;
+            sendButton.classList.add('loading');
+            sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             userInput.disabled = true;
 
             // Agregar mensaje del usuario al chat
             addMessageToChat('user', message);
+            saveToHistory('user', message);
             userInput.value = '';
 
             // Mostrar indicador de escritura
             typingIndicator.classList.add('active');
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            scrollToBottom(false);
 
-            // Obtener respuesta del bot
-            const response = await obtenerRespuesta(message);
+            try {
+                // Obtener respuesta del bot
+                const response = await obtenerRespuesta(message);
 
-            // Ocultar indicador de escritura
-            typingIndicator.classList.remove('active');
+                // Ocultar indicador de escritura
+                typingIndicator.classList.remove('active');
 
-            // Agregar respuesta del bot al chat
-            addMessageToChat('bot', response.respuesta, response.preguntas);
-
-            // Rehabilitar botón y input
-            sendButton.disabled = false;
-            userInput.disabled = false;
-            userInput.focus();
+                // Agregar respuesta del bot al chat
+                addMessageToChat('bot', response.respuesta, response.preguntas);
+                saveToHistory('bot', response.respuesta);
+            } catch (error) {
+                console.error("Error al obtener respuesta:", error);
+                const errorMessage = "Lo siento, ocurrió un error al procesar tu pregunta. 😔 Por favor, intenta nuevamente más tarde.";
+                addMessageToChat('bot', errorMessage, [
+                    "¿Puedes reformular tu pregunta?",
+                    "¿Necesitas ayuda con algo específico?",
+                    "¿Quieres intentar con otra pregunta?"
+                ]);
+                saveToHistory('bot', errorMessage);
+            } finally {
+                // Rehabilitar botón y input
+                sendButton.disabled = false;
+                sendButton.classList.remove('loading');
+                sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                userInput.disabled = false;
+                setTimeout(() => {
+                    userInput.focus();
+                }, 100);
+            }
         }
 
         // Función para agregar mensajes al chat
@@ -750,11 +843,16 @@
             messageContent.classList.add('message-content');
             messageContent.innerHTML = formatMessage(message);
 
+            // Añadir botón de copiar
+            if (sender === 'bot') {
+                addCopyButton(messageContent, message);
+            }
+
             // Crear timestamp
             const timestamp = document.createElement('div');
             timestamp.classList.add('timestamp');
             const now = new Date();
-            timestamp.textContent = `Hoy, ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+            timestamp.textContent = `Hoy, ${formatTimestamp(now)}`;
 
             // Estructurar el mensaje
             const messageInfo = document.createElement('div');
@@ -793,11 +891,39 @@
 
             // Scroll al final del chat con animación suave
             setTimeout(() => {
-                chatContainer.scrollTo({
-                    top: chatContainer.scrollHeight,
-                    behavior: 'smooth'
-                });
+                scrollToBottom(true);
             }, 100);
+        }
+
+        function addCopyButton(messageContent, messageText) {
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+            copyBtn.onclick = async () => {
+                try {
+                    await navigator.clipboard.writeText(messageText);
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => copyBtn.innerHTML = '<i class="fas fa-copy"></i>', 2000);
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                }
+            };
+            messageContent.appendChild(copyBtn);
+        }
+
+        function scrollToBottom(smooth = true) {
+            const behavior = smooth ? 'smooth' : 'auto';
+            chatContainer.scrollTo({
+                top: chatContainer.scrollHeight,
+                behavior
+            });
+        }
+
+        function formatTimestamp(date) {
+            return date.toLocaleTimeString('es-ES', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
         }
 
         // Función para formatear mensajes (admite markdown básico)
@@ -812,8 +938,8 @@
         function escapeHtml(text) {
             const map = {
                 '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
+                '<': '<',
+                '>': '>',
                 '"': '&quot;',
                 "'": '&#039;'
             };
@@ -838,6 +964,33 @@
                 respuesta = respuesta.replace(regex, `<a href="${escapeHtml(dato.enlace)}" target="_blank">${escapeHtml(nombre)}</a>`);
             }
             return respuesta;
+        }
+
+        // Función para parsear la respuesta del bot
+        function parseBotResponse(responseText) {
+            const sections = {
+                respuesta: '',
+                preguntas: []
+            };
+            
+            // Handle cases where formatting might be inconsistent
+            const respuestaMatch = responseText.match(/\[RESPUESTA\]([\s\S]*?)(?:\[\/RESPUESTA\]|\[PREGUNTAS\]|$)/i);
+            if (respuestaMatch) {
+                sections.respuesta = respuestaMatch[1].trim();
+            } else {
+                sections.respuesta = responseText;
+            }
+            
+            // Parse questions more flexibly
+            const preguntasMatch = responseText.match(/\[PREGUNTAS\]([\s\S]*?)(?:\[\/PREGUNTAS\]|$)/i);
+            if (preguntasMatch) {
+                const lines = preguntasMatch[1].split('\n').filter(line => line.trim());
+                sections.preguntas = lines.map(line => {
+                    return line.replace(/^\d+\.\s*/, '').trim();
+                }).filter(q => q.length > 0).slice(0, 3);
+            }
+            
+            return sections;
         }
 
         // Función para obtener respuesta de la API de Gemini
@@ -891,7 +1044,7 @@
             4. Mantén un tono profesional pero accesible y usa emojis ocasionalmente.
             5. No inventes información que no esté en la base de datos.
             6. Puedes hacer referencia a los IDs de restricción o datos cuando sea relevante.
-            7. Usa formato de texto enriquecido cuando sea apropiado (**negrita**, *cursiva*).
+            7. Usa formato de texto enriquecido cuando sea apropiado (**negrita**, *cursiva).
             8. Cuando menciones un área protegida o dato específico que tenga un enlace, incluye su nombre exactamente como aparece en la base de datos para que pueda ser identificado como enlace.
             9. Después de tu respuesta, genera exactamente 3 preguntas de seguimiento que el usuario podría hacer para profundizar en el tema. Estas preguntas deben estar basadas en la conversación actual y en la información proporcionada.
             10. Si la pregunta del usuario es ambigua, poco clara o puede interpretarse de varias maneras, pide amablemente que la aclare antes de responder. Usa frases como "¿Podrías especificar a qué te refieres con…?" o "Para responder con precisión, necesito un poco más de detalle sobre…".
@@ -926,7 +1079,7 @@
                 contents: contenidos,
                 generationConfig: {
                     temperature: 0.7,
-                    maxOutputTokens: 3000, // Aumentado para evitar respuestas cortadas
+                    maxOutputTokens: 3000,
                 }
             };
 
@@ -949,103 +1102,58 @@
                 if (dataResp?.candidates?.[0]?.content?.parts?.[0]?.text) {
                     const respuestaCompleta = dataResp.candidates[0].content.parts[0].text.trim();
                     
-                    // Extraer la respuesta principal y las preguntas
-                    let respuestaPrincipal = "";
-                    let preguntasSeguimiento = [];
-                    console.log(respuestaCompleta)
-                    
-                    // Parsear la respuesta - manejo robusto de etiquetas
-                    const respuestaMatch = respuestaCompleta.match(/\[RESPUESTA\]([\s\S]*?)\[\/RESPUESTA\]/i);
-                    if (respuestaMatch && respuestaMatch[1]) {
-                        respuestaPrincipal = respuestaMatch[1].trim();
-                    } else {
-                        // Si no se encuentra el formato, buscar sin etiqueta de cierre
-                        const respuestaSinCierre = respuestaCompleta.match(/\[RESPUESTA\]([\s\S]*?)(?=\[PREGUNTAS\]|$)/i);
-                        if (respuestaSinCierre && respuestaSinCierre[1]) {
-                            respuestaPrincipal = respuestaSinCierre[1].trim();
-                        } else {
-                            // Si no se encuentra, quitar cualquier etiqueta y mostrar todo
-                            respuestaPrincipal = respuestaCompleta.replace(/\[\/?RESPUESTA\]/gi, '').trim();
-                        }
-                    }
-                    
-                    const preguntasMatch = respuestaCompleta.match(/\[PREGUNTAS\]([\s\S]*?)\[\/PREGUNTAS\]/i);
-                    if (preguntasMatch && preguntasMatch[1]) {
-                        // Extraer las preguntas numeradas
-                        const lineas = preguntasMatch[1].split('\n');
-                        for (const linea of lineas) {
-                            const match = linea.match(/^\d+\.\s*(.+)$/);
-                            if (match && match[1]) {
-                                preguntasSeguimiento.push(match[1].trim());
-                            }
-                        }
-                        
-                        // Si no se extrajeron suficientes preguntas, generar algunas genéricas
-                        if (preguntasSeguimiento.length < 3) {
-                            const preguntasGenericas = [
-                                "¿Puedes darme más detalles sobre este tema?",
-                                "¿Cómo se relaciona esto con otras áreas protegidas?",
-                                "Qué implicaciones tiene esto para el cumplimiento del EUDR?"
-                            ];
-                            
-                            while (preguntasSeguimiento.length < 3) {
-                                preguntasSeguimiento.push(preguntasGenericas[preguntasSeguimiento.length]);
-                            }
-                        }
-                    } else {
-                        // Si no se encuentran preguntas, generar algunas genéricas
-                        preguntasSeguimiento = [
-                            "¿Puedes darme más detalles sobre este tema?",
-                            "¿Cómo se relaciona esto con otras áreas protegidas?",
-                            "Qué implicaciones tiene esto para el cumplimiento del EUDR?"
-                        ];
-                    }
+                    // Parsear la respuesta
+                    const parsedResponse = parseBotResponse(respuestaCompleta);
                     
                     // Agregamos los enlaces a la respuesta principal
-                    respuestaPrincipal = agregarEnlacesARespuesta(respuestaPrincipal);
+                    parsedResponse.respuesta = agregarEnlacesARespuesta(parsedResponse.respuesta);
                     
                     // Agregar la respuesta del modelo al historial (solo la respuesta principal)
                     historialConversacion.push({
                         role: "model",
-                        parts: [{ text: respuestaPrincipal }]
+                        parts: [{ text: parsedResponse.respuesta }]
                     });
 
                     return {
-                        respuesta: respuestaPrincipal,
-                        preguntas: preguntasSeguimiento
+                        respuesta: parsedResponse.respuesta,
+                        preguntas: parsedResponse.preguntas.length > 0 ? parsedResponse.preguntas : [
+                            "¿Puedes darme más detalles sobre este tema?",
+                            "¿Cómo se relaciona esto con otras áreas protegidas?",
+                            "Qué implicaciones tiene esto para el cumplimiento del EUDR?"
+                        ]
                     };
                 } else {
                     throw new Error("Respuesta inesperada de la API de Gemini");
                 }
             } catch (error) {
                 console.error("Error al llamar a la API de Gemini:", error);
-                return {
-                    respuesta: "Lo siento, ocurrió un error al procesar tu pregunta. 😔 Por favor, intenta nuevamente más tarde o verifica tu conexión a internet.",
-                    preguntas: [
-                        "¿Qué áreas protegidas existen en Belice?",
-                        "¿Cuáles son las restricciones principales?",
-                        "¿Cómo se aplican los geoprocesos?"
-                    ]
-                };
+                throw error;
             }
         }
 
-        // Función para limpiar el historial
-        function limpiarHistorial() {
-            historialConversacion = [];
-            localStorage.removeItem('chatHistory');
+        // Función para guardar en historial
+        function saveToHistory(sender, message) {
+            chatHistory.push({
+                sender,
+                message,
+                timestamp: new Date().toISOString()
+            });
         }
-
-        // Auto-focus en el input al cargar la página
-        window.addEventListener('load', () => {
-            userInput.focus();
-        });
 
         // Manejar cambios de orientación en dispositivos móviles
         window.addEventListener('orientationchange', () => {
             setTimeout(() => {
-                chatContainer.scrollTop = chatContainer.scrollHeight;
+                scrollToBottom(false);
             }, 300);
+        });
+
+        // Manejar visibilidad de la página
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                setTimeout(() => {
+                    userInput.focus();
+                }, 300);
+            }
         });
     </script>
 </body>
