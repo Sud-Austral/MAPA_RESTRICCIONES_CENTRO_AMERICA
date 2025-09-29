@@ -1,0 +1,2179 @@
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>
+                body {
+                  background-color: white; /* Ensure the iframe has a white background */
+                }
+    
+                
+              </style>
+                        </head>
+                        <body>
+                            <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chatbot - Áreas Protegidas de Belice</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root {
+            --primary-color: #1e88e5;
+            --primary-dark: #1565c0;
+            --primary-light: #64b5f6;
+            --secondary-color: #43a047;
+            --accent-color: #ff7043;
+            --background: #f5f7fa;
+            --surface: #ffffff;
+            --text-primary: #212121;
+            --text-secondary: #757575;
+            --divider: #e0e0e0;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 5px 15px rgba(0, 0, 0, 0.2);
+            --radius: 12px;
+            font-size: 18px;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            position: relative;
+            overflow-x: hidden;
+            font-size: 18px;
+            transition: background 0.3s ease;
+        }
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><pattern id="leaf" patternUnits="userSpaceOnUse" width="100" height="100"><g fill="rgba(255,255,255,0.1)"><path d="M50 10c20 0 30 15 30 40-5-20-15-30-30-30s-25 10-30 30c0-25 10-40 30-40z"/></g></pattern></defs><rect width="100%" height="100%" fill="url(%23leaf)"/></svg>') repeat;
+            opacity: 0.1;
+            z-index: -1;
+            animation: float 20s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        .container {
+            width: 100vw;
+            height: 100vh;
+            max-width: none;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 0;
+            box-shadow: none;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: none;
+            border: none;
+            position: relative;
+            transition: background 0.3s ease;
+        }
+        body.dark-mode .container {
+            background: rgba(45, 45, 45, 0.95);
+        }
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        .header h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin: 0;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .header p {
+            font-size: 18px;
+            opacity: 0.95;
+            margin-top: 8px;
+            position: relative;
+            z-index: 2;
+        }
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-color), var(--secondary-color));
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--divider);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        body.dark-mode .controls {
+            background: rgba(30, 30, 30, 0.9);
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .control-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .control-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        .search-container {
+            position: relative;
+            flex: 1;
+            max-width: 300px;
+        }
+        #search-input {
+            width: 100%;
+            padding: 8px 35px 8px 12px;
+            border: 1px solid var(--divider);
+            border-radius: 20px;
+            outline: none;
+            font-size: 14px;
+        }
+        .search-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+        .theme-selector {
+            display: flex;
+            gap: 5px;
+        }
+        .theme-btn {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .theme-btn.active {
+            border-color: var(--primary-color);
+            transform: scale(1.2);
+        }
+        .theme-default { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .theme-ocean { background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%); }
+        .theme-forest { background: linear-gradient(135deg, #43a047 0%, #1b5e20 100%); }
+        .theme-sunset { background: linear-gradient(135deg, #ff7043 0%, #e64a19 100%); }
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+        body.dark-mode .chat-container {
+            background: linear-gradient(to bottom, #2d2d2d, #1a1a1a);
+        }
+        .compact-view .chat-container {
+            padding: 10px;
+            gap: 10px;
+        }
+        .compact-view .message-content {
+            padding: 12px 16px;
+            font-size: 16px;
+        }
+        .compact-view .bot-avatar, .compact-view .user-avatar {
+            width: 32px;
+            height: 32px;
+        }
+        .message {
+            display: flex;
+            margin-bottom: 5px;
+            animation: fadeInUp 0.4s ease-out;
+        }
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        .user-message {
+            justify-content: flex-end;
+        }
+        .bot-message {
+            justify-content: flex-start;
+        }
+        .message-content {
+            max-width: 75%;
+            padding: 20px 24px;
+            border-radius: 20px;
+            position: relative;
+            word-wrap: break-word;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            font-size: 18px;
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+        }
+        .message-content:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+        .user-message .message-content {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border-bottom-right-radius: 5px;
+            position: relative;
+        }
+        .user-message .message-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+            border-radius: inherit;
+            pointer-events: none;
+        }
+        .bot-message .message-content {
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+            color: var(--text-primary);
+            border: 1px solid rgba(30, 136, 229, 0.1);
+            border-bottom-left-radius: 5px;
+        }
+        body.dark-mode .bot-message .message-content {
+            background: linear-gradient(135deg, #3d3d3d, #2d2d2d);
+            border-color: rgba(30, 136, 229, 0.3);
+        }
+        .input-container {
+            display: flex;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--divider);
+            gap: 10px;
+            align-items: center;
+        }
+        body.dark-mode .input-container {
+            background: rgba(30, 30, 30, 0.9);
+        }
+        #user-input {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid var(--divider);
+            border-radius: 25px;
+            outline: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+            max-width: 1000px;
+        }
+        body.dark-mode #user-input {
+            background: #2d2d2d;
+            color: white;
+            border-color: #555;
+        }
+        #user-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
+            transform: translateY(-1px);
+        }
+        .input-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .action-btn {
+            background: var(--primary-light);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .action-btn:hover {
+            background: var(--primary-color);
+            transform: scale(1.1);
+        }
+        #send-button {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
+        }
+        #send-button:hover {
+            transform: scale(1.1) translateY(-2px);
+            box-shadow: 0 6px 16px rgba(30, 136, 229, 0.4);
+        }
+        #send-button:active {
+            transform: scale(0.95);
+        }
+        #send-button.loading {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .typing-indicator {
+            display: none;
+            padding: 10px 20px;
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 14px;
+            animation: pulse 1.5s infinite;
+            text-align: center;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        .typing-indicator.active {
+            display: block;
+        }
+        .bot-avatar, .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        .bot-avatar {
+            background: linear-gradient(135deg, var(--secondary-color), #2e7d32);
+            margin-right: 12px;
+        }
+        .user-avatar {
+            background: linear-gradient(135deg, var(--accent-color), #e64a19);
+            margin-left: 12px;
+        }
+        .bot-avatar:hover, .user-avatar:hover {
+            transform: scale(1.1);
+        }
+        .message-wrapper {
+            display: flex;
+            align-items: flex-end;
+            max-width: 85%;
+        }
+        .bot-message .message-wrapper {
+            flex-direction: row;
+        }
+        .user-message .message-wrapper {
+            flex-direction: row-reverse;
+            margin-left: auto;
+        }
+        .timestamp {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            text-align: right;
+            opacity: 0.7;
+        }
+        .bot-message .timestamp {
+            text-align: left;
+        }
+        .footer {
+            padding: 12px 15px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--divider);
+        }
+        body.dark-mode .footer {
+            background: rgba(30, 30, 30, 0.9);
+        }
+        .connection-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--secondary-color);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            z-index: 10;
+        }
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #f44336;
+            animation: fadeInUp 0.4s ease-out;
+        }
+        .copy-btn {
+            background: rgba(255,255,255,0.3);
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            margin-left: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .message-content:hover .copy-btn {
+            opacity: 1;
+        }
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.5);
+        }
+        .favorite-btn {
+            background: rgba(255,255,255,0.3);
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            margin-left: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .message-content:hover .favorite-btn {
+            opacity: 1;
+        }
+        .favorite-btn:hover {
+            background: rgba(255,255,255,0.5);
+        }
+        .favorite-btn.active {
+            color: #ffcc00;
+            opacity: 1;
+        }
+        .suggested-questions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+            margin-left: 52px;
+        }
+        .suggested-question {
+            background: rgba(30, 136, 229, 0.1);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            outline: none;
+            text-align: center;
+            flex: 1 1 calc(33% - 10px);
+            min-width: 150px;
+        }
+        .suggested-question:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(30, 136, 229, 0.2);
+        }
+        .suggested-question:active {
+            transform: scale(0.95);
+        }
+        .suggested-question:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+        .bot-message .message-content a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-bottom: 1px dotted transparent;
+        }
+        .bot-message .message-content a:hover {
+            color: var(--primary-dark);
+            border-bottom-color: var(--primary-dark);
+        }
+        .link-preview {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 8px;
+            font-size: 14px;
+            max-width: 300px;
+        }
+        .link-preview h4 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+        }
+        .link-preview p {
+            margin: 0;
+            color: var(--text-secondary);
+        }
+        .image-preview {
+            margin-top: 10px;
+            max-width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .image-preview img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .autocomplete-container {
+            position: relative;
+            flex: 1;
+        }
+        .autocomplete-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--divider);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+        body.dark-mode .autocomplete-suggestions {
+            background: #2d2d2d;
+            border-color: #555;
+        }
+        .autocomplete-suggestion {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .autocomplete-suggestion:hover {
+            background: rgba(30, 136, 229, 0.1);
+        }
+        .autocomplete-suggestion.selected {
+            background: rgba(30, 136, 229, 0.2);
+        }
+        .context-panel {
+            position: absolute;
+            right: -350px;
+            top: 0;
+            width: 350px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-left: 1px solid var(--divider);
+            padding: 20px;
+            overflow-y: auto;
+            transition: right 0.3s ease;
+            z-index: 100;
+        }
+        body.dark-mode .context-panel {
+            background: rgba(30, 30, 30, 0.95);
+        }
+        .context-panel.open {
+            right: 0;
+        }
+        .context-panel h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+        .context-panel .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+        .map-container {
+            height: 300px;
+            margin-top: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .share-code {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 8px;
+            font-family: monospace;
+            text-align: center;
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+        .text-size-controls {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .text-size-btn {
+            background: var(--primary-light);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .text-size-btn:hover {
+            background: var(--primary-color);
+        }
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .notification .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .fullscreen-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+        }
+        .fullscreen-header {
+            padding: 15px 20px;
+            background: rgba(30, 30, 30, 0.9);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .fullscreen-header h2 {
+            color: white;
+            margin: 0;
+        }
+        .fullscreen-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .fullscreen-exit {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .favorites-panel {
+            position: absolute;
+            left: -350px;
+            top: 0;
+            width: 350px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid var(--divider);
+            padding: 20px;
+            overflow-y: auto;
+            transition: left 0.3s ease;
+            z-index: 100;
+        }
+        body.dark-mode .favorites-panel {
+            background: rgba(30, 30, 30, 0.95);
+        }
+        .favorites-panel.open {
+            left: 0;
+        }
+        .favorites-panel h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+        .favorites-panel .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+        .favorite-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .favorite-item:hover {
+            background: rgba(30, 136, 229, 0.1);
+        }
+        .favorite-item .timestamp {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .translation-panel {
+            position: absolute;
+            bottom: -200px;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--divider);
+            padding: 20px;
+            transition: bottom 0.3s ease;
+            z-index: 100;
+            overflow-y: auto;
+        }
+        body.dark-mode .translation-panel {
+            background: rgba(30, 30, 30, 0.95);
+        }
+        .translation-panel.open {
+            bottom: 0;
+        }
+        .translation-panel h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+        .translation-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .translation-controls select {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid var(--divider);
+            border-radius: 4px;
+            background: white;
+        }
+        body.dark-mode .translation-controls select {
+            background: #2d2d2d;
+            color: white;
+        }
+        .translation-result {
+            padding: 15px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 8px;
+            min-height: 80px;
+        }
+        .voice-indicator {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+        }
+        .voice-indicator.active {
+            display: flex;
+        }
+        .voice-indicator .pulse {
+            width: 10px;
+            height: 10px;
+            background: #ff5252;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+        @media (max-width: 768px) {
+            .controls {
+                padding: 8px 10px;
+            }
+            .control-group {
+                flex-wrap: wrap;
+            }
+            .search-container {
+                max-width: 100%;
+                order: 3;
+                flex-basis: 100%;
+            }
+            .context-panel {
+                width: 100%;
+                right: -100%;
+            }
+            .favorites-panel {
+                width: 100%;
+                left: -100%;
+            }
+            .header h1 {
+                font-size: 20px;
+            }
+            .header p {
+                font-size: 13px;
+            }
+            .chat-container {
+                padding: 10px;
+            }
+            .message-content {
+                max-width: 85%;
+                padding: 12px 16px;
+                font-size: 16px;
+            }
+            .bot-avatar, .user-avatar {
+                width: 36px;
+                height: 36px;
+            }
+            .bot-avatar {
+                margin-right: 8px;
+            }
+            .user-avatar {
+                margin-left: 8px;
+            }
+            .input-container {
+                padding: 12px 10px;
+            }
+            #user-input {
+                padding: 12px 16px;
+                font-size: 16px;
+            }
+            #send-button {
+                width: 45px;
+                height: 45px;
+            }
+            .suggested-questions {
+                margin-left: 44px;
+                flex-direction: column;
+            }
+            .suggested-question {
+                flex: 1 1 100%;
+                min-width: auto;
+                font-size: 14px;
+            }
+        }
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 18px;
+            }
+            .header p {
+                font-size: 12px;
+            }
+            .message-content {
+                max-width: 90%;
+                padding: 10px 14px;
+                font-size: 15px;
+            }
+            .bot-avatar, .user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+            #user-input {
+                padding: 10px 14px;
+                font-size: 16px;
+            }
+            #send-button {
+                width: 42px;
+                height: 42px;
+            }
+        }
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .container {
+                max-width: 700px;
+                height: 80vh;
+            }
+            .message-content {
+                max-width: 70%;
+                font-size: 17px;
+            }
+        }
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1000px;
+            }
+            .message-content {
+                font-size: 19px;
+            }
+        }
+        .chat-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chat-container::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+        .chat-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+        .chat-container::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        }
+        .container {
+            animation: slideInUp 0.6s ease-out;
+        }
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        @media (max-height: 500px) and (orientation: landscape) {
+            .container {
+                height: 95vh;
+            }
+            .header {
+                padding: 10px;
+            }
+            .header h1 {
+                font-size: 18px;
+            }
+            .header p {
+                display: none;
+            }
+            .chat-container {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="connection-status" id="connection-status">
+            <i class="fas fa-wifi"></i> Conectado
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <button class="control-btn" id="theme-toggle">
+                    <i class="fas fa-moon"></i> Modo Oscuro
+                </button>
+                <button class="control-btn" id="compact-toggle">
+                    <i class="fas fa-compress-alt"></i> Compacto
+                </button>
+                <button class="control-btn" id="fullscreen-toggle">
+                    <i class="fas fa-expand"></i> Pantalla Completa
+                </button>
+                <button class="control-btn" id="download-chat">
+                    <i class="fas fa-download"></i> Descargar
+                </button>
+                <button class="control-btn" id="share-chat">
+                    <i class="fas fa-share-alt"></i> Compartir
+                </button>
+                <button class="control-btn" id="favorites-toggle">
+                    <i class="fas fa-star"></i> Favoritos
+                </button>
+                <button class="control-btn" id="context-toggle">
+                    <i class="fas fa-info-circle"></i> Contexto
+                </button>
+            </div>
+            <div class="control-group">
+                <div class="text-size-controls">
+                    <button class="text-size-btn" id="text-decrease">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <span id="text-size-display">18px</span>
+                    <button class="text-size-btn" id="text-increase">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div class="theme-selector">
+                    <div class="theme-btn theme-default active" data-theme="default"></div>
+                    <div class="theme-btn theme-ocean" data-theme="ocean"></div>
+                    <div class="theme-btn theme-forest" data-theme="forest"></div>
+                    <div class="theme-btn theme-sunset" data-theme="sunset"></div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="Buscar en historial...">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+            </div>
+        </div>
+        <div class="header">
+            <h1><i class="fas fa-leaf"></i> Información geoespacial para el cumplimiento del Reglamento Europeo sobre Productos Libres de Deforestación (EUDR)</h1>
+            <p>Consulta información sobre restricciones, geoprocesos y regulaciones ambientales</p>
+        </div>
+        <div class="chat-container" id="chat-container">
+            <div class="message bot-message">
+                <div class="message-wrapper">
+                    <div class="bot-avatar">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <div>
+                        <div class="message-content">
+                            ¡Hola! 🌿 Soy tu asistente especializado en áreas protegidas. Puedes preguntarme sobre restricciones, geoprocesos o cualquier aspecto relacionado con los datos disponibles. ¿En qué puedo ayudarte hoy?
+                        </div>
+                        <div class="timestamp">Hoy, 10:30 AM</div>
+                        <div class="suggested-questions" id="initial-questions">
+                            <button class="suggested-question">¿Qué áreas protegidas existen en Belice?</button>
+                            <button class="suggested-question">¿Cuáles son las restricciones principales?</button>
+                            <button class="suggested-question">¿Cómo se aplican los geoprocesos?</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="typing-indicator" id="typing-indicator">
+            <i class="fas fa-robot"></i> Escribiendo respuesta...
+        </div>
+        <div class="input-container">
+            <div class="autocomplete-container">
+                <input type="text" id="user-input" placeholder="Escribe tu pregunta aquí..." aria-label="Escribe tu pregunta" autocomplete="off" maxlength="1000" />
+                <div class="autocomplete-suggestions" id="autocomplete-suggestions"></div>
+            </div>
+            <div class="input-actions">
+                <button class="action-btn" id="voice-input" title="Entrada de voz">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <button class="action-btn" id="image-upload" title="Subir imagen">
+                    <i class="fas fa-image"></i>
+                </button>
+                <button class="action-btn" id="translate-btn" title="Traducir">
+                    <i class="fas fa-language"></i>
+                </button>
+                <input type="file" id="image-input" accept="image/*" style="display: none;">
+                <button id="send-button" aria-label="Enviar mensaje" title="Enviar mensaje">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+        <div class="footer">
+            <i class="fas fa-shield-alt"></i> Asistente de Consultas - Áreas Protegidas de Belice © 2024
+        </div>
+        <!-- Panel de Favoritos -->
+        <div class="favorites-panel" id="favorites-panel">
+            <button class="close-btn" id="close-favorites">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3><i class="fas fa-star"></i> Mensajes Favoritos</h3>
+            <div id="favorites-list">
+                <p>No tienes mensajes favoritos aún.</p>
+            </div>
+        </div>
+        <!-- Panel de Contexto -->
+        <div class="context-panel" id="context-panel">
+            <button class="close-btn" id="close-context">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3><i class="fas fa-info-circle"></i> Información Contextual</h3>
+            <div id="context-content">
+                <p>Selecciona un mensaje para ver información contextual relacionada.</p>
+            </div>
+            <div class="map-container" id="map-container"></div>
+            <div class="share-code" id="share-code">
+                <!-- Código de compartir se generará aquí -->
+            </div>
+        </div>
+        <!-- Panel de Traducción -->
+        <div class="translation-panel" id="translation-panel">
+            <h3><i class="fas fa-language"></i> Traducción</h3>
+            <div class="translation-controls">
+                <select id="source-lang">
+                    <option value="es">Español</option>
+                    <option value="en">Inglés</option>
+                    <option value="fr">Francés</option>
+                    <option value="de">Alemán</option>
+                    <option value="pt">Portugués</option>
+                </select>
+                <select id="target-lang">
+                    <option value="en">Inglés</option>
+                    <option value="es">Español</option>
+                    <option value="fr">Francés</option>
+                    <option value="de">Alemán</option>
+                    <option value="pt">Portugués</option>
+                </select>
+                <button class="control-btn" id="translate-now">Traducir</button>
+            </div>
+            <div class="translation-result" id="translation-result">
+                <p>Selecciona un mensaje para traducirlo.</p>
+            </div>
+        </div>
+    </div>
+    <!-- Indicador de Voz -->
+    <div class="voice-indicator" id="voice-indicator">
+        <div class="pulse"></div>
+        <span>Escuchando...</span>
+    </div>
+    <!-- Notificación -->
+    <div class="notification" id="notification">
+        <i class="fas fa-bell"></i>
+        <span id="notification-text">Notificación</span>
+        <button class="close-btn" id="notification-close">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <!-- Vista Pantalla Completa -->
+    <div class="fullscreen-overlay" id="fullscreen-overlay">
+        <div class="fullscreen-header">
+            <h2>Chat en Pantalla Completa</h2>
+            <button class="fullscreen-exit" id="fullscreen-exit">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="fullscreen-content" id="fullscreen-content">
+            <!-- Contenido del chat aquí -->
+        </div>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Mock data for demonstration (replaces db.js and pass.js)
+        const datos = [
+            {
+                id: 1,
+                nombre: "Belize Barrier Reef",
+                tipo: "Área marina protegida",
+                descripcion: "El segundo arrecife de coral más grande del mundo, declarado Patrimonio de la Humanidad por la UNESCO.",
+                enlace: "https://whc.unesco.org/en/list/764"
+            },
+            {
+                id: 2,
+                nombre: "Cockscomb Basin Wildlife Sanctuary",
+                tipo: "Santuario de vida silvestre",
+                descripcion: "Primera reserva dedicada exclusivamente a la conservación del jaguar en el mundo.",
+                enlace: "https://www.belizeaudubon.org/cockscomb-basin-wildlife-sanctuary/"
+            },
+            {
+                id: 3,
+                nombre: "Río Bravo Conservation Area",
+                tipo: "Área de conservación",
+                descripcion: "Una de las áreas protegidas más grandes de Belice, crucial para la conservación de bosques tropicales.",
+                enlace: "https://www.programmebee.org/rio-bravo-conservation-and-management-area"
+            }
+        ];
+
+        // Mock API URL (replaces pass.js)
+        const url = "https://api.example.com/gemini"; // This would be your actual API endpoint
+
+        // Historial de la conversación
+        let historialConversacion = [];
+        let chatHistory = [];
+        let favorites = [];
+        let lastMessageTime = 0;
+        const MIN_MESSAGE_INTERVAL = 1000;
+        const MAX_MESSAGE_LENGTH = 1000;
+        let currentFontSize = 18;
+        let isDarkMode = false;
+        let isCompactView = false;
+        let currentTheme = 'default';
+        let selectedMessage = null;
+        let map = null;
+        let recognition = null;
+        let synthesis = window.speechSynthesis;
+        // Elementos del DOM
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const typingIndicator = document.getElementById('typing-indicator');
+        const connectionStatus = document.getElementById('connection-status');
+        const themeToggle = document.getElementById('theme-toggle');
+        const compactToggle = document.getElementById('compact-toggle');
+        const fullscreenToggle = document.getElementById('fullscreen-toggle');
+        const downloadChat = document.getElementById('download-chat');
+        const shareChat = document.getElementById('share-chat');
+        const favoritesToggle = document.getElementById('favorites-toggle');
+        const contextToggle = document.getElementById('context-toggle');
+        const favoritesPanel = document.getElementById('favorites-panel');
+        const contextPanel = document.getElementById('context-panel');
+        const closeFavorites = document.getElementById('close-favorites');
+        const closeContext = document.getElementById('close-context');
+        const textDecrease = document.getElementById('text-decrease');
+        const textIncrease = document.getElementById('text-increase');
+        const textSizeDisplay = document.getElementById('text-size-display');
+        const searchInput = document.getElementById('search-input');
+        const voiceInput = document.getElementById('voice-input');
+        const imageUpload = document.getElementById('image-upload');
+        const imageInput = document.getElementById('image-input');
+        const translateBtn = document.getElementById('translate-btn');
+        const translationPanel = document.getElementById('translation-panel');
+        const translateNow = document.getElementById('translate-now');
+        const sourceLang = document.getElementById('source-lang');
+        const targetLang = document.getElementById('target-lang');
+        const translationResult = document.getElementById('translation-result');
+        const voiceIndicator = document.getElementById('voice-indicator');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notification-text');
+        const notificationClose = document.getElementById('notification-close');
+        const fullscreenOverlay = document.getElementById('fullscreen-overlay');
+        const fullscreenExit = document.getElementById('fullscreen-exit');
+        const fullscreenContent = document.getElementById('fullscreen-content');
+        const favoritesList = document.getElementById('favorites-list');
+        const contextContent = document.getElementById('context-content');
+        const mapContainer = document.getElementById('map-container');
+        const shareCode = document.getElementById('share-code');
+        const autocompleteSuggestions = document.getElementById('autocomplete-suggestions');
+        // Preguntas frecuentes para autocompletado
+        const frequentQuestions = [
+            "¿Qué áreas protegidas existen en Belice?",
+            "¿Cuáles son las restricciones principales?",
+            "¿Cómo se aplican los geoprocesos?",
+            "¿Qué es el Reglamento EUDR?",
+            "¿Cómo afecta el EUDR a los productores?",
+            "¿Qué productos están cubiertos por el EUDR?",
+            "¿Cómo se verifica el cumplimiento del EUDR?",
+            "¿Qué sanciones existen por incumplimiento?",
+            "¿Cómo se define la deforestación en el EUDR?",
+            "¿Qué fechas límite establece el EUDR?"
+        ];
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar historial y favoritos desde localStorage (commented out to avoid localStorage errors)
+            // loadFromStorage();
+            // Configurar eventos
+            setupEventListeners();
+            // Configurar reconocimiento de voz
+            setupSpeechRecognition();
+            // Configurar mapa
+            setupMap();
+            // Añadir event listeners a las preguntas iniciales
+            const initialQuestions = document.querySelectorAll('#initial-questions .suggested-question');
+            initialQuestions.forEach(question => {
+                question.addEventListener('click', function() {
+                    userInput.value = this.textContent;
+                    sendMessage();
+                });
+            });
+            // Auto-focus en el input al cargar la página
+            userInput.focus();
+            // Actualizar UI según configuración guardada
+            updateUIFromSettings();
+        });
+        function setupEventListeners() {
+            // Event listeners principales
+            sendButton.addEventListener('click', sendMessage);
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            userInput.addEventListener('input', function() {
+                if (this.value.length > MAX_MESSAGE_LENGTH) {
+                    this.value = this.value.substring(0, MAX_MESSAGE_LENGTH);
+                }
+                showAutocompleteSuggestions(this.value);
+            });
+            // Prevenir zoom en iOS cuando se enfoca el input
+            userInput.addEventListener('touchstart', function() {
+                userInput.style.fontSize = '16px';
+            });
+            // Controles de tema
+            themeToggle.addEventListener('click', toggleDarkMode);
+            compactToggle.addEventListener('click', toggleCompactView);
+            fullscreenToggle.addEventListener('click', toggleFullscreen);
+            downloadChat.addEventListener('click', downloadChatHistory);
+            shareChat.addEventListener('click', shareCurrentChat);
+            favoritesToggle.addEventListener('click', toggleFavoritesPanel);
+            contextToggle.addEventListener('click', toggleContextPanel);
+            closeFavorites.addEventListener('click', toggleFavoritesPanel);
+            closeContext.addEventListener('click', toggleContextPanel);
+            // Controles de tamaño de texto
+            textDecrease.addEventListener('click', decreaseTextSize);
+            textIncrease.addEventListener('click', increaseTextSize);
+            // Búsqueda
+            searchInput.addEventListener('input', searchInHistory);
+            // Entrada de voz
+            voiceInput.addEventListener('click', startVoiceInput);
+            // Subida de imágenes
+            imageUpload.addEventListener('click', () => imageInput.click());
+            imageInput.addEventListener('change', handleImageUpload);
+            // Traducción
+            translateBtn.addEventListener('click', toggleTranslationPanel);
+            translateNow.addEventListener('click', translateSelectedMessage);
+            // Notificaciones
+            notificationClose.addEventListener('click', hideNotification);
+            // Pantalla completa
+            fullscreenExit.addEventListener('click', toggleFullscreen);
+            // Selector de temas de color
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const theme = this.dataset.theme;
+                    changeTheme(theme);
+                });
+            });
+            // Cerrar paneles al hacer clic fuera
+            document.addEventListener('click', function(e) {
+                if (!favoritesPanel.contains(e.target) && !favoritesToggle.contains(e.target)) {
+                    favoritesPanel.classList.remove('open');
+                }
+                if (!contextPanel.contains(e.target) && !contextToggle.contains(e.target)) {
+                    contextPanel.classList.remove('open');
+                }
+                if (!translationPanel.contains(e.target) && !translateBtn.contains(e.target)) {
+                    translationPanel.classList.remove('open');
+                }
+            });
+        }
+        function setupSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'es-ES';
+                recognition.onstart = function() {
+                    voiceIndicator.classList.add('active');
+                    voiceInput.innerHTML = '<i class="fas fa-stop"></i>';
+                };
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    userInput.value = transcript;
+                    sendMessage();
+                };
+                recognition.onerror = function(event) {
+                    console.error('Error en reconocimiento de voz:', event.error);
+                    showNotification('Error en reconocimiento de voz. Inténtalo de nuevo.');
+                };
+                recognition.onend = function() {
+                    voiceIndicator.classList.remove('active');
+                    voiceInput.innerHTML = '<i class="fas fa-microphone"></i>';
+                };
+            } else {
+                voiceInput.style.display = 'none';
+            }
+        }
+        function setupMap() {
+            map = L.map('map-container').setView([17.1899, -88.4976], 8);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            // Añadir marcadores de ejemplo para áreas protegidas
+            const protectedAreas = [
+                {name: "Belize Barrier Reef", lat: 17.1899, lng: -87.4976},
+                {name: "Cockscomb Basin Wildlife Sanctuary", lat: 16.7599, lng: -88.4976},
+                {name: "Guanacaste National Park", lat: 17.1599, lng: -89.0976}
+            ];
+            protectedAreas.forEach(area => {
+                L.marker([area.lat, area.lng])
+                    .addTo(map)
+                    .bindPopup(area.name);
+            });
+        }
+        function loadFromStorage() {
+            // Commented out localStorage usage to avoid errors in current environment
+            /*
+            // Cargar historial de chat
+            const savedHistory = localStorage.getItem('chatHistory');
+            if (savedHistory) {
+                chatHistory = JSON.parse(savedHistory);
+                renderChatHistory();
+            }
+            // Cargar favoritos
+            const savedFavorites = localStorage.getItem('favorites');
+            if (savedFavorites) {
+                favorites = JSON.parse(savedFavorites);
+                renderFavorites();
+            }
+            // Cargar configuración
+            const savedSettings = localStorage.getItem('chatSettings');
+            if (savedSettings) {
+                const settings = JSON.parse(savedSettings);
+                currentFontSize = settings.fontSize || 18;
+                isDarkMode = settings.darkMode || false;
+                isCompactView = settings.compactView || false;
+                currentTheme = settings.theme || 'default';
+            }
+            */
+        }
+        function saveToStorage() {
+            // Commented out localStorage usage to avoid errors in current environment
+            /*
+            // Guardar historial de chat
+            localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+            // Guardar favoritos
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            // Guardar configuración
+            const settings = {
+                fontSize: currentFontSize,
+                darkMode: isDarkMode,
+                compactView: isCompactView,
+                theme: currentTheme
+            };
+            localStorage.setItem('chatSettings', JSON.stringify(settings));
+            */
+        }
+        function updateUIFromSettings() {
+            // Aplicar tamaño de texto
+            document.documentElement.style.fontSize = `${currentFontSize}px`;
+            textSizeDisplay.textContent = `${currentFontSize}px`;
+            // Aplicar modo oscuro
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i> Modo Claro';
+            }
+            // Aplicar vista compacta
+            if (isCompactView) {
+                document.body.classList.add('compact-view');
+                compactToggle.innerHTML = '<i class="fas fa-expand-alt"></i> Normal';
+            }
+            // Aplicar tema de color
+            changeTheme(currentTheme);
+        }
+        function renderChatHistory() {
+            // Limpiar contenedor excepto el mensaje inicial
+            const initialMessage = chatContainer.querySelector('.message.bot-message');
+            chatContainer.innerHTML = '';
+            chatContainer.appendChild(initialMessage);
+            // Renderizar mensajes del historial
+            chatHistory.forEach(msg => {
+                if (msg.sender === 'user' || msg.sender === 'bot') {
+                    addMessageToChat(msg.sender, msg.message, [], msg.timestamp);
+                }
+            });
+            scrollToBottom();
+        }
+        function renderFavorites() {
+            if (favorites.length === 0) {
+                favoritesList.innerHTML = '<p>No tienes mensajes favoritos aún.</p>';
+                return;
+            }
+            favoritesList.innerHTML = '';
+            favorites.forEach((fav, index) => {
+                const favItem = document.createElement('div');
+                favItem.className = 'favorite-item';
+                favItem.innerHTML = `
+                    <div>${fav.message.substring(0, 100)}${fav.message.length > 100 ? '...' : ''}</div>
+                    <div class="timestamp">${formatTimestamp(new Date(fav.timestamp))}</div>
+                `;
+                favItem.addEventListener('click', () => {
+                    // Ir al mensaje en el chat
+                    const messageElement = document.querySelector(`[data-id="${fav.id}"]`);
+                    if (messageElement) {
+                        messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        messageElement.classList.add('highlight');
+                        setTimeout(() => {
+                            messageElement.classList.remove('highlight');
+                        }, 2000);
+                    }
+                });
+                favoritesList.appendChild(favItem);
+            });
+        }
+        function sendMessage() {
+            const now = Date.now();
+            if (now - lastMessageTime < MIN_MESSAGE_INTERVAL) {
+                return; // Prevent spam
+            }
+            lastMessageTime = now;
+            const message = sanitizeInput(userInput.value.trim());
+            if (message === '') return;
+            // Deshabilitar botón y input durante el envío
+            sendButton.disabled = true;
+            sendButton.classList.add('loading');
+            sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            userInput.disabled = true;
+            // Agregar mensaje del usuario al chat
+            addMessageToChat('user', message);
+            // saveToHistory('user', message); // Commented out due to localStorage
+            userInput.value = '';
+            // Mostrar indicador de escritura
+            typingIndicator.classList.add('active');
+            scrollToBottom(false);
+            try {
+                // Simular respuesta del bot (since we can't call actual API)
+                setTimeout(() => {
+                    typingIndicator.classList.remove('active');
+                    let responseText = "";
+                    let suggestedQuestions = [
+                        "¿Puedes darme más detalles sobre este tema?",
+                        "¿Cómo se relaciona esto con otras áreas protegidas?",
+                        "Qué implicaciones tiene esto para el cumplimiento del EUDR?"
+                    ];
+                    
+                    // Basic response logic based on question
+                    if (message.toLowerCase().includes("áreas protegidas") || message.toLowerCase().includes("belice")) {
+                        responseText = "Belice cuenta con varias áreas protegidas importantes, incluyendo el **Belize Barrier Reef** (el segundo arrecife de coral más grande del mundo), el **Cockscomb Basin Wildlife Sanctuary** (primera reserva de jaguares del mundo), y la **Río Bravo Conservation Area**. Estas áreas son fundamentales para el cumplimiento del Reglamento EUDR ya que protegen ecosistemas críticos.";
+                        suggestedQuestions = [
+                            "¿Cuáles son las restricciones específicas en estas áreas?",
+                            "¿Cómo se monitorean estas áreas protegidas?",
+                            "¿Qué productos están prohibidos en estas zonas?"
+                        ];
+                    } else if (message.toLowerCase().includes("restricciones")) {
+                        responseText = "Las principales restricciones en áreas protegidas de Belice incluyen: prohibición de tala ilegal, restricciones a la agricultura comercial, limitaciones a la pesca, y regulaciones estrictas para el desarrollo turístico. Estas medidas aseguran el cumplimiento con el **Reglamento Europeo sobre Productos Libres de Deforestación (EUDR)**.";
+                        suggestedQuestions = [
+                            "¿Cómo se aplican estas restricciones en la práctica?",
+                            "¿Qué sanciones existen por violarlas?",
+                            "¿Cómo afectan a los productores locales?"
+                        ];
+                    } else if (message.toLowerCase().includes("geoprocesos")) {
+                        responseText = "Los geoprocesos utilizados incluyen monitoreo satelital, sistemas de información geográfica (SIG), y análisis de imágenes de alta resolución para detectar cambios en la cobertura forestal. Estos procesos permiten verificar el cumplimiento del EUDR mediante la identificación de actividades ilegales en tiempo real.";
+                        suggestedQuestions = [
+                            "¿Qué tecnología específica se utiliza?",
+                            "¿Con qué frecuencia se actualizan los datos?",
+                            "¿Cómo acceden los productores a esta información?"
+                        ];
+                    } else {
+                        responseText = "Gracias por tu pregunta. Basado en la información disponible sobre áreas protegidas de Belice y el Reglamento EUDR, puedo ayudarte con consultas específicas sobre restricciones, geoprocesos, o regulaciones ambientales. ¿Podrías reformular tu pregunta para ser más específica?";
+                        suggestedQuestions = [
+                            "¿Qué áreas protegidas existen en Belice?",
+                            "¿Cuáles son las restricciones principales?",
+                            "¿Cómo se aplican los geoprocesos?"
+                        ];
+                    }
+                    
+                    // Add links to response
+                    responseText = agregarEnlacesARespuesta(responseText);
+                    
+                    // Agregar respuesta del bot al chat
+                    addMessageToChat('bot', responseText, suggestedQuestions);
+                    // saveToHistory('bot', responseText); // Commented out due to localStorage
+                    
+                    // Mostrar notificación si la página no está activa
+                    if (document.hidden) {
+                        showNotification('Tienes una nueva respuesta del asistente');
+                    }
+                    
+                    // Rehabilitar botón y input
+                    sendButton.disabled = false;
+                    sendButton.classList.remove('loading');
+                    sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                    userInput.disabled = false;
+                    setTimeout(() => {
+                        userInput.focus();
+                    }, 100);
+                }, 1500);
+            } catch (error) {
+                console.error("Error al enviar mensaje:", error);
+                // Rehabilitar botón y input en caso de error
+                sendButton.disabled = false;
+                sendButton.classList.remove('loading');
+                sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                userInput.disabled = false;
+            }
+        }
+        function addMessageToChat(sender, message, preguntas = [], timestamp = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+            // Generar ID único para el mensaje
+            const messageId = Date.now().toString() + Math.random().toString(36).substr(2, 5);
+            messageDiv.dataset.id = messageId;
+            const messageWrapper = document.createElement('div');
+            messageWrapper.classList.add('message-wrapper');
+            // Crear avatar
+            const avatar = document.createElement('div');
+            avatar.classList.add(sender === 'user' ? 'user-avatar' : 'bot-avatar');
+            avatar.innerHTML = sender === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-leaf"></i>';
+            // Crear contenido del mensaje
+            const messageContent = document.createElement('div');
+            messageContent.classList.add('message-content');
+            messageContent.innerHTML = formatMessage(message);
+            // Añadir botones de acción
+            if (sender === 'bot') {
+                addCopyButton(messageContent, message);
+                addFavoriteButton(messageContent, messageId, message);
+            }
+            // Crear timestamp
+            const timestampDiv = document.createElement('div');
+            timestampDiv.classList.add('timestamp');
+            const now = timestamp ? new Date(timestamp) : new Date();
+            timestampDiv.textContent = `Hoy, ${formatTimestamp(now)}`;
+            // Estructurar el mensaje
+            const messageInfo = document.createElement('div');
+            messageInfo.appendChild(messageContent);
+            messageInfo.appendChild(timestampDiv);
+            if (sender === 'user') {
+                messageWrapper.appendChild(messageInfo);
+                messageWrapper.appendChild(avatar);
+            } else {
+                messageWrapper.appendChild(avatar);
+                messageWrapper.appendChild(messageInfo);
+                // Agregar preguntas sugeridas para respuestas del bot
+                if (preguntas.length > 0) {
+                    const suggestedQuestions = document.createElement('div');
+                    suggestedQuestions.classList.add('suggested-questions');
+                    preguntas.forEach(question => {
+                        const button = document.createElement('button');
+                        button.classList.add('suggested-question');
+                        button.textContent = question;
+                        button.addEventListener('click', function() {
+                            userInput.value = question;
+                            sendMessage();
+                        });
+                        suggestedQuestions.appendChild(button);
+                    });
+                    messageInfo.appendChild(suggestedQuestions);
+                }
+                // Agregar vista previa de enlaces si hay alguno
+                const links = extractLinks(message);
+                if (links.length > 0) {
+                    const linkPreview = document.createElement('div');
+                    linkPreview.classList.add('link-preview');
+                    linkPreview.innerHTML = `
+                        <h4>${links[0].title || 'Enlace'}</h4>
+                        <p>${links[0].description || 'Sin descripción disponible'}</p>
+                    `;
+                    messageInfo.appendChild(linkPreview);
+                }
+            }
+            messageDiv.appendChild(messageWrapper);
+            chatContainer.appendChild(messageDiv);
+            // Scroll al final del chat con animación suave
+            setTimeout(() => {
+                scrollToBottom(true);
+            }, 100);
+            // Añadir evento de clic para mostrar contexto
+            if (sender === 'bot') {
+                messageContent.addEventListener('click', function() {
+                    showContextForMessage(messageId, message);
+                });
+            }
+        }
+        function addCopyButton(messageContent, messageText) {
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+            copyBtn.onclick = async () => {
+                try {
+                    await navigator.clipboard.writeText(messageText);
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => copyBtn.innerHTML = '<i class="fas fa-copy"></i>', 2000);
+                    showNotification('Texto copiado al portapapeles');
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                }
+            };
+            messageContent.appendChild(copyBtn);
+        }
+        function addFavoriteButton(messageContent, messageId, messageText) {
+            const favoriteBtn = document.createElement('button');
+            favoriteBtn.className = 'favorite-btn';
+            favoriteBtn.innerHTML = '<i class="far fa-star"></i>';
+            // Verificar si ya es favorito
+            const isFavorite = favorites.some(fav => fav.id === messageId);
+            if (isFavorite) {
+                favoriteBtn.classList.add('active');
+                favoriteBtn.innerHTML = '<i class="fas fa-star"></i>';
+            }
+            favoriteBtn.onclick = () => {
+                const isFavorite = favorites.some(fav => fav.id === messageId);
+                if (isFavorite) {
+                    // Eliminar de favoritos
+                    favorites = favorites.filter(fav => fav.id !== messageId);
+                    favoriteBtn.classList.remove('active');
+                    favoriteBtn.innerHTML = '<i class="far fa-star"></i>';
+                    showNotification('Eliminado de favoritos');
+                } else {
+                    // Agregar a favoritos
+                    favorites.push({
+                        id: messageId,
+                        message: messageText,
+                        timestamp: new Date().toISOString()
+                    });
+                    favoriteBtn.classList.add('active');
+                    favoriteBtn.innerHTML = '<i class="fas fa-star"></i>';
+                    showNotification('Agregado a favoritos');
+                }
+                renderFavorites();
+                // saveToStorage(); // Commented out due to localStorage
+            };
+            messageContent.appendChild(favoriteBtn);
+        }
+        function extractLinks(text) {
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            const links = [];
+            let match;
+            while ((match = urlRegex.exec(text)) !== null) {
+                links.push({
+                    url: match[0],
+                    title: 'Enlace externo',
+                    description: 'Haz clic para visitar el sitio'
+                });
+            }
+            return links;
+        }
+        function showContextForMessage(messageId, message) {
+            selectedMessage = {
+                id: messageId,
+                text: message
+            };
+            // Actualizar panel de contexto
+            contextContent.innerHTML = `
+                <h4>Información relacionada</h4>
+                <p>Este mensaje contiene información sobre áreas protegidas y regulaciones ambientales en Belice.</p>
+                <p>Puedes explorar más detalles en el mapa interactivo o generar un código para compartir esta información específica.</p>
+            `;
+            // Generar código de compartir
+            const shareCodeValue = generateShareCode(messageId);
+            shareCode.textContent = shareCodeValue;
+            // Abrir panel de contexto
+            contextPanel.classList.add('open');
+        }
+        function generateShareCode(messageId) {
+            // Generar código simple basado en el ID del mensaje
+            return `SHARE-${messageId.substring(0, 8).toUpperCase()}`;
+        }
+        function showAutocompleteSuggestions(query) {
+            if (query.length < 2) {
+                autocompleteSuggestions.style.display = 'none';
+                return;
+            }
+            const filteredQuestions = frequentQuestions.filter(q => 
+                q.toLowerCase().includes(query.toLowerCase())
+            );
+            if (filteredQuestions.length === 0) {
+                autocompleteSuggestions.style.display = 'none';
+                return;
+            }
+            autocompleteSuggestions.innerHTML = '';
+            filteredQuestions.slice(0, 5).forEach(question => {
+                const suggestion = document.createElement('div');
+                suggestion.className = 'autocomplete-suggestion';
+                suggestion.textContent = question;
+                suggestion.addEventListener('click', () => {
+                    userInput.value = question;
+                    autocompleteSuggestions.style.display = 'none';
+                    sendMessage();
+                });
+                autocompleteSuggestions.appendChild(suggestion);
+            });
+            autocompleteSuggestions.style.display = 'block';
+        }
+        function startVoiceInput() {
+            if (recognition) {
+                if (voiceIndicator.classList.contains('active')) {
+                    recognition.stop();
+                } else {
+                    recognition.start();
+                }
+            } else {
+                showNotification('Tu navegador no soporta reconocimiento de voz');
+            }
+        }
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const imagePreview = document.createElement('div');
+                    imagePreview.className = 'image-preview';
+                    imagePreview.innerHTML = `<img src="${event.target.result}" alt="Imagen subida">`;
+                    // Agregar al input como mensaje
+                    userInput.value = `[Imagen: ${file.name}]`;
+                    // Mostrar vista previa temporal
+                    const inputContainer = document.querySelector('.input-container');
+                    inputContainer.appendChild(imagePreview);
+                    // Eliminar vista previa después de enviar
+                    setTimeout(() => {
+                        imagePreview.remove();
+                    }, 5000);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode');
+            if (isDarkMode) {
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i> Modo Claro';
+            } else {
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i> Modo Oscuro';
+            }
+            // saveToStorage(); // Commented out due to localStorage
+        }
+        function toggleCompactView() {
+            isCompactView = !isCompactView;
+            document.body.classList.toggle('compact-view');
+            if (isCompactView) {
+                compactToggle.innerHTML = '<i class="fas fa-expand-alt"></i> Normal';
+            } else {
+                compactToggle.innerHTML = '<i class="fas fa-compress-alt"></i> Compacto';
+            }
+            // saveToStorage(); // Commented out due to localStorage
+        }
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    showNotification(`Error al entrar en pantalla completa: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+        function downloadChatHistory() {
+            let chatText = "Historial de Conversación - Asistente de Áreas Protegidas\n";
+            // Since we can't use localStorage, we'll collect messages from DOM
+            const messages = document.querySelectorAll('.message');
+            messages.forEach(msg => {
+                const sender = msg.classList.contains('user-message') ? 'Usuario' : 'Asistente';
+                const time = msg.querySelector('.timestamp')?.textContent || 'Hoy, ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                const content = msg.querySelector('.message-content')?.textContent || '';
+                chatText += `[${time}] ${sender}:\n${content}\n\n`;
+            });
+            const blob = new Blob([chatText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `chat-historial-${new Date().toISOString().slice(0, 10)}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('Historial descargado correctamente');
+        }
+        function shareCurrentChat() {
+            if (navigator.share) {
+                const shareData = {
+                    title: 'Conversación con Asistente de Áreas Protegidas',
+                    text: 'Mira mi conversación sobre áreas protegidas de Belice',
+                    url: window.location.href
+                };
+                navigator.share(shareData)
+                    .then(() => showNotification('Compartido correctamente'))
+                    .catch(err => showNotification('Error al compartir'));
+            } else {
+                // Fallback: copiar al portapapeles
+                const shareText = `Conversación con Asistente de Áreas Protegidas: ${window.location.href}`;
+                navigator.clipboard.writeText(shareText)
+                    .then(() => showNotification('Enlace copiado al portapapeles'))
+                    .catch(err => showNotification('Error al copiar'));
+            }
+        }
+        function toggleFavoritesPanel() {
+            favoritesPanel.classList.toggle('open');
+        }
+        function toggleContextPanel() {
+            contextPanel.classList.toggle('open');
+        }
+        function toggleTranslationPanel() {
+            translationPanel.classList.toggle('open');
+        }
+        function decreaseTextSize() {
+            if (currentFontSize > 14) {
+                currentFontSize -= 2;
+                updateTextSize();
+            }
+        }
+        function increaseTextSize() {
+            if (currentFontSize < 24) {
+                currentFontSize += 2;
+                updateTextSize();
+            }
+        }
+        function updateTextSize() {
+            document.documentElement.style.fontSize = `${currentFontSize}px`;
+            textSizeDisplay.textContent = `${currentFontSize}px`;
+            // saveToStorage(); // Commented out due to localStorage
+        }
+        function searchInHistory() {
+            const query = searchInput.value.toLowerCase().trim();
+            if (query === '') {
+                // Restaurar todos los mensajes
+                document.querySelectorAll('.message').forEach(msg => {
+                    msg.style.display = 'flex';
+                });
+                return;
+            }
+            // Filtrar mensajes
+            document.querySelectorAll('.message').forEach(msg => {
+                const text = msg.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    msg.style.display = 'flex';
+                } else {
+                    msg.style.display = 'none';
+                }
+            });
+        }
+        function translateSelectedMessage() {
+            if (!selectedMessage) {
+                translationResult.innerHTML = '<p>Selecciona un mensaje para traducirlo.</p>';
+                return;
+            }
+            const source = sourceLang.value;
+            const target = targetLang.value;
+            // Simulación de traducción (en una implementación real se usaría una API)
+            translationResult.innerHTML = `
+                <div class="typing-indicator active">
+                    <i class="fas fa-language"></i> Traduciendo...
+                </div>
+            `;
+            setTimeout(() => {
+                // Simulación de resultado de traducción
+                const translatedText = `[Traducción simulada de "${selectedMessage.text.substring(0, 50)}..." a ${target}]`;
+                translationResult.innerHTML = `
+                    <p><strong>Original:</strong> ${selectedMessage.text}</p>
+                    <p><strong>Traducción (${target}):</strong> ${translatedText}</p>
+                `;
+            }, 1500);
+        }
+        function showNotification(message) {
+            notificationText.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => {
+                hideNotification();
+            }, 5000);
+        }
+        function hideNotification() {
+            notification.classList.remove('show');
+        }
+        function changeTheme(theme) {
+            currentTheme = theme;
+            // Actualizar botones activos
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.theme === theme) {
+                    btn.classList.add('active');
+                }
+            });
+            // Cambiar colores según el tema
+            const root = document.documentElement;
+            switch(theme) {
+                case 'ocean':
+                    root.style.setProperty('--primary-color', '#0277bd');
+                    root.style.setProperty('--primary-dark', '#01579b');
+                    root.style.setProperty('--primary-light', '#58a5f0');
+                    break;
+                case 'forest':
+                    root.style.setProperty('--primary-color', '#2e7d32');
+                    root.style.setProperty('--primary-dark', '#1b5e20');
+                    root.style.setProperty('--primary-light', '#4caf50');
+                    break;
+                case 'sunset':
+                    root.style.setProperty('--primary-color', '#e64a19');
+                    root.style.setProperty('--primary-dark', '#bf360c');
+                    root.style.setProperty('--primary-light', '#ff7043');
+                    break;
+                default:
+                    // Restaurar valores predeterminados
+                    root.style.setProperty('--primary-color', '#1e88e5');
+                    root.style.setProperty('--primary-dark', '#1565c0');
+                    root.style.setProperty('--primary-light', '#64b5f6');
+            }
+            // saveToStorage(); // Commented out due to localStorage
+        }
+        function scrollToBottom(smooth = true) {
+            const behavior = smooth ? 'smooth' : 'auto';
+            chatContainer.scrollTo({
+                top: chatContainer.scrollHeight,
+                behavior
+            });
+        }
+        function formatTimestamp(date) {
+            return date.toLocaleTimeString('es-ES', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+        }
+        function formatMessage(message) {
+            return message
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+        }
+        function sanitizeInput(input) {
+            const div = document.createElement('div');
+            div.textContent = input;
+            return div.innerHTML;
+        }
+        function saveToHistory(sender, message) {
+            // Commented out localStorage usage
+            /*
+            chatHistory.push({
+                sender,
+                message,
+                timestamp: new Date().toISOString()
+            });
+            saveToStorage();
+            */
+        }
+        // Función para parsear la respuesta del bot (not used in mock version)
+        function parseBotResponse(responseText) {
+            const sections = {
+                respuesta: '',
+                preguntas: []
+            };
+            const respuestaMatch = responseText.match(/\[RESPUESTA\]([\s\S]*?)(?:\[\/RESPUESTA\]|\[PREGUNTAS\]|$)/i);
+            if (respuestaMatch) {
+                sections.respuesta = respuestaMatch[1].trim();
+            } else {
+                sections.respuesta = responseText;
+            }
+            const preguntasMatch = responseText.match(/\[PREGUNTAS\]([\s\S]*?)(?:\[\/PREGUNTAS\]|$)/i);
+            if (preguntasMatch) {
+                const lines = preguntasMatch[1].split('\n').filter(line => line.trim());
+                sections.preguntas = lines.map(line => {
+                    return line.replace(/^\d+\.\s*/, '').trim();
+                }).filter(q => q.length > 0).slice(0, 3);
+            }
+            return sections;
+        }
+        // Función para agregar enlaces a la respuesta basada en los datos
+        function agregarEnlacesARespuesta(respuesta) {
+            if (typeof respuesta !== 'string') return respuesta;
+            const datosConEnlace = datos.filter(dato => dato.enlace && dato.nombre);
+            const datosOrdenados = datosConEnlace.sort((a, b) => b.nombre.length - a.nombre.length);
+            for (const dato of datosOrdenados) {
+                const nombre = dato.nombre;
+                const nombreEscapado = nombre.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`\\b${nombreEscapado}\\b`, 'gi');
+                respuesta = respuesta.replace(regex, `<a href="${escapeHtml(dato.enlace)}" target="_blank">${escapeHtml(nombre)}</a>`);
+            }
+            return respuesta;
+        }
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+        // Mock function - original API call commented out
+        /*
+        async function obtenerRespuesta(pregunta) {
+            // ... original implementation ...
+        }
+        */
+        // Manejar cambios de orientación en dispositivos móviles
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                scrollToBottom(false);
+            }, 300);
+        });
+        // Manejar visibilidad de la página
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                setTimeout(() => {
+                    userInput.focus();
+                }, 300);
+            }
+        });
+        // Manejar pantalla completa
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                // Entrando en pantalla completa
+                fullscreenContent.innerHTML = chatContainer.innerHTML;
+                fullscreenOverlay.style.display = 'flex';
+            } else {
+                // Saliendo de pantalla completa
+                fullscreenOverlay.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+    
+              <script>
+                              
+              </script>
+                        </body>
+                        </html>
+                    
