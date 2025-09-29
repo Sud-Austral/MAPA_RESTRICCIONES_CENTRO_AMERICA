@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador GeoJSON - Centroamérica</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Leaflet Draw CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --light-bg: #ecf0f1;
+            --dark-text: #2c3e50;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            overflow: hidden;
+        }
+        
+        #map {
+            height: 100vh;
+            width: 100%;
+            z-index: 1;
+        }
+        
+        .control-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            max-height: 85vh;
+            overflow-y: auto;
+            width: 300px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .control-panel h4 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light-bg);
+        }
+        
+        .layer-item {
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .layer-item:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        .layer-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-right: 12px;
+            display: inline-block;
+            border: 2px solid white;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+        }
+        
+        .layer-name {
+            flex-grow: 1;
+            font-weight: 500;
+            color: var(--dark-text);
+        }
+        
+        .layer-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-layer {
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-layer:hover {
+            transform: scale(1.1);
+        }
+        
+        .reload-btn {
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .reload-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        .legend {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .legend h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: var(--primary-color);
+            font-weight: 600;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--light-bg);
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .legend-item:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 4px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            display: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            min-width: 320px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+        
+        .loading-progress {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .loading-layers {
+            margin-top: 15px;
+            font-size: 15px;
+            color: #7f8c8d;
+        }
+        
+        .loading-error {
+            margin-top: 15px;
+            color: var(--danger-color);
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 18px 25px;
+            background-color: var(--success-color);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+            z-index: 2000;
+            display: none;
+            max-width: 400px;
+            font-weight: 500;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .notification.show {
+            display: block;
+            transform: translateY(0);
+        }
+        
+        .notification.error {
+            background-color: var(--danger-color);
+        }
+        
+        .notification i {
+            margin-right: 10px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: #95a5a6;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #bdc3c7;
+        }
+        
+        .empty-state p {
+            margin: 0;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    
+    <div class="control-panel">
+        <h4><i class="fas fa-layer-group me-2"></i> Capas GeoJSON</h4>
+        
+        <div id="layers-list">
+            <div class="empty-state">
+                <i class="fas fa-map-marked-alt"></i>
+                <p>Cargando capas...</p>
+            </div>
+        </div>
+        
+        <button id="reload-btn" class="reload-btn">
+            <i class="fas fa-sync-alt me-2"></i> Recargar Capas
+        </button>
+    </div>
+    
+    <div class="legend">
+        <h4><i class="fas fa-list me-2"></i> Leyenda</h4>
+        <div id="legend-items">
+            <div class="empty-state">
+                <i class="fas fa-info-circle"></i>
+                <p>Sin capas visibles</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="loading" id="loading-indicator">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+        <div class="loading-progress" id="loading-progress">Iniciando carga de capas...</div>
+        <div class="loading-layers" id="loading-layers"></div>
+        <div class="loading-error" id="loading-error"></div>
+    </div>
+    
+    <div class="notification" id="notification">
+        <!-- Mensajes de notificación -->
+    </div>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Leaflet Draw JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Inicializar el mapa
+        const map = L.map('map').setView([15.7835, -90.2308], 7); // Centro en Guatemala
+        
+        // Añadir capa base de OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Objeto para almacenar las capas GeoJSON
+        const geojsonLayers = {};
+        
+        // Colores predefinidos para las capas iniciales
+        const predefinedColors = {
+            'MEX_AreasConserVoluntaria': '#4CAF50',
+            'MEX_AreasProt': '#F44336',
+            'MEX_Buffer_costa': '#2196F3',
+            'MEX_Buffer_hidro': '#00BCD4'
+        };
+        
+        // Variables para controlar la carga inicial
+        let totalInitialLayers = 0;
+        let loadedInitialLayers = 0;
+        let loadingErrors = [];
+        
+        // Función para mostrar notificaciones
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            const icon = isError ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+            notification.innerHTML = `<i class="${icon}"></i> ${message}`;
+            notification.className = isError ? 'notification error' : 'notification';
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+        
+        // Función para generar un color aleatorio
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+        
+        // Función para actualizar el indicador de carga
+        function updateLoadingIndicator() {
+            const loadingProgress = document.getElementById('loading-progress');
+            const loadingLayers = document.getElementById('loading-layers');
+            const loadingError = document.getElementById('loading-error');
+            
+            if (loadedInitialLayers === 0) {
+                loadingProgress.textContent = 'Iniciando carga de capas...';
+                loadingLayers.textContent = '';
+                loadingError.textContent = '';
+            } else if (loadedInitialLayers < totalInitialLayers) {
+                loadingProgress.textContent = `Cargando capas... (${loadedInitialLayers}/${totalInitialLayers})`;
+                loadingLayers.textContent = `${totalInitialLayers - loadedInitialLayers} capas restantes por cargar`;
+                
+                if (loadingErrors.length > 0) {
+                    loadingError.textContent = `${loadingErrors.length} error(es) de carga`;
+                }
+            } else {
+                // Todas las capas se han cargado (con o sin errores)
+                document.getElementById('loading-indicator').style.display = 'none';
+                
+                if (loadingErrors.length === 0) {
+                    showNotification('Todas las capas se han cargado correctamente');
+                } else {
+                    showNotification(`Se cargaron ${totalInitialLayers - loadingErrors.length} de ${totalInitialLayers} capas. ${loadingErrors.length} capa(s) no se pudieron cargar.`, true);
+                }
+            }
+        }
+        
+        // Función para añadir una capa GeoJSON
+        function addGeoJSONLayer(name, url, color = null, isInitial = false) {
+            // Mostrar indicador de carga si es una capa inicial
+            if (isInitial) {
+                document.getElementById('loading-indicator').style.display = 'block';
+                updateLoadingIndicator();
+            }
+            
+            // Si no se especifica color, usar uno aleatorio
+            if (!color) {
+                color = getRandomColor();
+            }
+            
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Error al cargar el GeoJSON: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Crear capa GeoJSON
+                    const layer = L.geoJSON(data, {
+                        style: {
+                            color: color,
+                            weight: 2,
+                            fillOpacity: 0.3
+                        },
+                        onEachFeature: function(feature, layer) {
+                            // Añadir popup con propiedades
+                            if (feature.properties) {
+                                let popupContent = '<div class="popup-content">';
+                                
+                                for (const key in feature.properties) {
+                                    popupContent += `<div><strong>${key}:</strong> ${feature.properties[key]}</div>`;
+                                }
+                                
+                                popupContent += '</div>';
+                                layer.bindPopup(popupContent);
+                            }
+                        }
+                    }).addTo(map);
+                    
+                    // Guardar la capa
+                    geojsonLayers[name] = {
+                        layer: layer,
+                        url: url,
+                        color: color,
+                        visible: true
+                    };
+                    
+                    // Actualizar la lista de capas
+                    updateLayersList();
+                    
+                    // Actualizar la leyenda
+                    updateLegend();
+                    
+                    // Si es una capa inicial, actualizar el contador
+                    if (isInitial) {
+                        loadedInitialLayers++;
+                        updateLoadingIndicator();
+                    }
+                    
+                    // Ajustar el mapa a las capas cargadas
+                    if (Object.keys(geojsonLayers).length === 1) {
+                        map.fitBounds(layer.getBounds());
+                    }
+                    
+                    // Mostrar notificación solo si no es una capa inicial
+                    if (!isInitial) {
+                        showNotification(`Capa "${name}" añadida correctamente`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    
+                    // Si es una capa inicial, registrar el error y actualizar el contador
+                    if (isInitial) {
+                        loadingErrors.push({ name, error: error.message });
+                        loadedInitialLayers++;
+                        updateLoadingIndicator();
+                    } else {
+                        showNotification(error.message, true);
+                    }
+                });
+        }
+        
+        // Función para actualizar la lista de capas en el panel
+        function updateLayersList() {
+            const layersList = document.getElementById('layers-list');
+            layersList.innerHTML = '';
+            
+            if (Object.keys(geojsonLayers).length === 0) {
+                layersList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <p>No hay capas disponibles</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            for (const name in geojsonLayers) {
+                const layerInfo = geojsonLayers[name];
+                const layerItem = document.createElement('div');
+                layerItem.className = 'layer-item';
+                
+                layerItem.innerHTML = `
+                    <div>
+                        <span class="layer-color" style="background-color: ${layerInfo.color}"></span>
+                        <span class="layer-name">${name}</span>
+                    </div>
+                    <div class="layer-actions">
+                        <button class="btn btn-sm ${layerInfo.visible ? 'btn-success' : 'btn-outline-secondary'} btn-layer toggle-layer" data-name="${name}">
+                            <i class="fas ${layerInfo.visible ? 'fa-eye' : 'fa-eye-slash'}"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger btn-layer remove-layer" data-name="${name}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                layersList.appendChild(layerItem);
+            }
+            
+            // Añadir event listeners a los botones
+            document.querySelectorAll('.toggle-layer').forEach(button => {
+                button.addEventListener('click', function() {
+                    const name = this.getAttribute('data-name');
+                    toggleLayer(name);
+                });
+            });
+            
+            document.querySelectorAll('.remove-layer').forEach(button => {
+                button.addEventListener('click', function() {
+                    const name = this.getAttribute('data-name');
+                    removeLayer(name);
+                });
+            });
+        }
+        
+        // Función para actualizar la leyenda
+        function updateLegend() {
+            const legendItems = document.getElementById('legend-items');
+            legendItems.innerHTML = '';
+            
+            const visibleLayers = Object.values(geojsonLayers).filter(layer => layer.visible);
+            
+            if (visibleLayers.length === 0) {
+                legendItems.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Sin capas visibles</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            for (const name in geojsonLayers) {
+                const layerInfo = geojsonLayers[name];
+                if (layerInfo.visible) {
+                    const legendItem = document.createElement('div');
+                    legendItem.className = 'legend-item';
+                    
+                    legendItem.innerHTML = `
+                        <div class="legend-color" style="background-color: ${layerInfo.color}"></div>
+                        <div>${name}</div>
+                    `;
+                    
+                    legendItems.appendChild(legendItem);
+                }
+            }
+        }
+        
+        // Función para alternar la visibilidad de una capa
+        function toggleLayer(name) {
+            if (geojsonLayers[name]) {
+                const layerInfo = geojsonLayers[name];
+                
+                if (layerInfo.visible) {
+                    map.removeLayer(layerInfo.layer);
+                    layerInfo.visible = false;
+                } else {
+                    map.addLayer(layerInfo.layer);
+                    layerInfo.visible = true;
+                }
+                
+                updateLayersList();
+                updateLegend();
+            }
+        }
+        
+        // Función para eliminar una capa
+        function removeLayer(name) {
+            if (geojsonLayers[name]) {
+                const layerInfo = geojsonLayers[name];
+                
+                if (layerInfo.visible) {
+                    map.removeLayer(layerInfo.layer);
+                }
+                
+                delete geojsonLayers[name];
+                updateLayersList();
+                updateLegend();
+                
+                showNotification(`Capa "${name}" eliminada`);
+            }
+        }
+        
+        // Función para recargar todas las capas
+        function reloadAllLayers() {
+            // Limpiar capas existentes
+            for (const name in geojsonLayers) {
+                const layerInfo = geojsonLayers[name];
+                if (layerInfo.visible) {
+                    map.removeLayer(layerInfo.layer);
+                }
+            }
+            
+            // Reiniciar variables
+            Object.keys(geojsonLayers).forEach(key => delete geojsonLayers[key]);
+            loadedInitialLayers = 0;
+            loadingErrors = [];
+            
+            // Actualizar UI
+            updateLayersList();
+            updateLegend();
+            
+            // Volver a cargar las capas iniciales
+            totalInitialLayers = initialLayers.length;
+            initialLayers.forEach(layerInfo => {
+                addGeoJSONLayer(layerInfo.name, layerInfo.url, layerInfo.color, true);
+            });
+        }
+        
+        // Evento para recargar capas
+        document.getElementById('reload-btn').addEventListener('click', reloadAllLayers);
+        
+        // Cargar las capas iniciales
+        const initialLayers = [
+            { name: 'Áreas de Conservación Voluntaria', url: 'https://raw.githubusercontent.com/Sud-Austral/MAPA_RESTRICCIONES_CENTRO_AMERICA/refs/heads/main/mapaData/MEX_AreasConserVoluntaria.json', color: predefinedColors.MEX_AreasConserVoluntaria },
+            { name: 'Áreas Protegidas', url: 'https://raw.githubusercontent.com/Sud-Austral/MAPA_RESTRICCIONES_CENTRO_AMERICA/refs/heads/main/mapaData/MEX_AreasProt.json', color: predefinedColors.MEX_AreasProt },
+            { name: 'Buffer Costa', url: 'https://raw.githubusercontent.com/Sud-Austral/MAPA_RESTRICCIONES_CENTRO_AMERICA/refs/heads/main/mapaData/MEX_Buffer_costa.json', color: predefinedColors.MEX_Buffer_costa },
+            { name: 'Buffer Hidrográfico', url: 'https://raw.githubusercontent.com/Sud-Austral/MAPA_RESTRICCIONES_CENTRO_AMERICA/refs/heads/main/mapaData/MEX_Buffer_hidro.json', color: predefinedColors.MEX_Buffer_hidro }
+        ];
+        
+        totalInitialLayers = initialLayers.length;
+        
+        // Cargar cada capa inicial
+        initialLayers.forEach(layerInfo => {
+            addGeoJSONLayer(layerInfo.name, layerInfo.url, layerInfo.color, true);
+        });
+    </script>
+</body>
+</html>
