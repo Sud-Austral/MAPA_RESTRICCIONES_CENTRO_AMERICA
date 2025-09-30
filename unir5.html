@@ -686,10 +686,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
-    
-    <!-- Datos de restricciones -->
     <script src="data/restriccion.js"></script>
-    
     <script>
         // Datos adaptados a la nueva estructura con URLs de GeoJSON
         
@@ -708,25 +705,8 @@
         });
 
         function initializeMap() {
-            // Obtener el primer país de los datos para centrar el mapa
-            let defaultCenter = [-15.0, -60.0]; // Sudamérica por defecto
-            let defaultZoom = 4;
-            
-            if (restrictionsData.length > 0) {
-                const firstCountry = restrictionsData[0].pais_restriccion;
-                const countryData = restrictionsData.find(item => item.pais_restriccion === firstCountry);
-                
-                if (countryData && countryData.coordenadas_centro) {
-                    const coords = countryData.coordenadas_centro.split(',');
-                    if (coords.length === 2) {
-                        defaultCenter = [parseFloat(coords[0]), parseFloat(coords[1])];
-                        defaultZoom = 6;
-                    }
-                }
-            }
-            
-            // Inicializar el mapa
-            map = L.map('map').setView(defaultCenter, defaultZoom);
+            // Inicializar el mapa centrado en Sudamérica
+            map = L.map('map').setView([-15.0, -60.0], 4);
             
             // Capa base (solo OpenStreetMap)
             const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -734,7 +714,7 @@
             });
             osmLayer.addTo(map);
             
-            // Agregar leyenda dinámica
+            // Agregar leyenda
             addLegend();
             
             // Evento para cuando se hace clic en el mapa
@@ -762,37 +742,44 @@
             // Actualizar el indicador de carga
             updateLoadingIndicator(loadedLayers, totalLayers, errorLayers);
             
-            // Mapeo de colores según tipo
-            const typeColors = {
-                'ambiental': '#3498db',
-                'forestal': '#3498db',
-                'hidrica': '#e74c3c',
-                'fauna': '#27ae60',
-                'urbana': '#8e44ad',
-                'cultural': '#1abc9c',
-                'otros': '#95a5a6'
+            // Colores predefinidos para las capas
+            const predefinedColors = {
+                'layer001': '#4CAF50',
+                'layer002': '#F44336',
+                'layer003': '#2196F3',
+                'layer004': '#00BCD4',
+                'layer005': '#FF9800',
+                'layer006': '#9C27B0',
+                'layer007': '#795548'
             };
             
-            // Función para obtener color según tipo
-            function getColorForType(type) {
-                for (const key in typeColors) {
-                    if (type.toLowerCase().includes(key)) {
-                        return typeColors[key];
-                    }
+            // Función para generar un color aleatorio
+            function getRandomColor() {
+                const letters = '0123456789ABCDEF';
+                let color = '#';
+                for (let i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
                 }
-                return typeColors.otros;
+                return color;
             }
             
             // Función para añadir una capa GeoJSON
-            function addGeoJSONLayer(id, name, url, type) {
-                // Obtener color según tipo
-                const color = getColorForType(type);
+            function addGeoJSONLayer(id, name, url, color = null) {
+                // Si no se especifica color, usar uno predefinido o aleatorio
+                if (!color) {
+                    color = predefinedColors[id] || getRandomColor();
+                }
                 
-                // Simular carga de GeoJSON (en producción usar fetch real)
-                setTimeout(() => {
-                    try {
-                        // Crear capa GeoJSON simulada
-                        const layer = L.geoJSON(null, {
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Error al cargar el GeoJSON: ${response.statusText}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Crear capa GeoJSON
+                        const layer = L.geoJSON(data, {
                             style: {
                                 color: color,
                                 weight: 2,
@@ -829,41 +816,13 @@
                             }
                         });
                         
-                        // Simular datos GeoJSON
-                        const geojsonData = {
-                            "type": "FeatureCollection",
-                            "features": [
-                                {
-                                    "type": "Feature",
-                                    "properties": {
-                                        "name": name,
-                                        "type": type,
-                                        "id": id
-                                    },
-                                    "geometry": {
-                                        "type": "Polygon",
-                                        "coordinates": [[
-                                            [-60.0, -15.0],
-                                            [-59.0, -15.0],
-                                            [-59.0, -14.0],
-                                            [-60.0, -14.0],
-                                            [-60.0, -15.0]
-                                        ]]
-                                    }
-                                }
-                            ]
-                        };
-                        
-                        layer.addData(geojsonData);
-                        
                         // Guardar la capa
                         geojsonLayers[id] = {
                             layer: layer,
                             url: url,
                             color: color,
                             visible: false,
-                            name: name,
-                            type: type
+                            name: name
                         };
                         
                         // Actualizar el contador
@@ -884,7 +843,8 @@
                                 }
                             }, 1000);
                         }
-                    } catch (error) {
+                    })
+                    .catch(error => {
                         console.error('Error:', error);
                         
                         // Actualizar el contador de errores
@@ -902,8 +862,7 @@
                                 }
                             }, 1000);
                         }
-                    }
-                }, 500); // Simular tiempo de carga
+                    });
             }
             
             // Cargar cada capa desde los datos
@@ -912,8 +871,7 @@
                     addGeoJSONLayer(
                         restriction.id_layer, 
                         restriction.descripcion_restriccion, 
-                        restriction.url_geojson,
-                        restriction.tipo_restriccion  // Pasar el tipo para asignar color
+                        restriction.url_geojson
                     );
                 }
             });
@@ -980,10 +938,7 @@
                 layerItem.innerHTML = `
                     <div>
                         <span class="layer-color" style="background-color: ${layerInfo.color}"></span>
-                        <div>
-                            <span class="layer-name">${layerInfo.name}</span>
-                            <div class="text-muted small">${layerInfo.type}</div>
-                        </div>
+                        <span class="layer-name">${layerInfo.name}</span>
                     </div>
                     <div class="layer-actions">
                         <button class="btn btn-sm ${layerInfo.visible ? 'btn-success' : 'btn-outline-secondary'} btn-layer toggle-layer" data-id="${id}">
@@ -1051,12 +1006,11 @@
         function showFeatureInfo(restriction) {
             let content = `
                 <strong>${restriction.descripcion_restriccion}</strong><br>
-                <strong>País:</strong> <a href="https://chatgpt.com/c/68dc069e-04bc-8332-9ebf-b5356822810a">${restriction.pais_restriccion}</a><br>
+                <strong>País:</strong> ${restriction.pais_restriccion}<br>
                 <strong>Tipo:</strong> ${restriction.tipo_restriccion}<br>
                 <strong>ID:</strong> ${restriction.ip_restriccion}<br>
-                <strong>Normativa:</strong> ${restriction.normativa_aplicable}<br>
-                <strong>Pertinencia EUDR:</strong> ${restriction.pertinencia_eudr ? 'Sí' : 'No'}<br>
-                <button class="btn btn-sm btn-primary mt-2" onclick="showDetailForId('${restriction.ip_restriccion}')">Ver Detalle Completo</button>
+                <button class="btn btn-sm btn-primary mt-2" onclick="viewOnMap('${restriction.pais_restriccion}', '${restriction.tipo_restriccion}', '${restriction.id_layer}')">Ver en Mapa</button>
+                <button class="btn btn-sm btn-outline-primary mt-2 ms-1" onclick="showDetailForId('${restriction.ip_restriccion}')">Ver Detalle</button>
             `;
             $('#featureContent').html(content);
             $('#featureInfo').show();
@@ -1087,43 +1041,17 @@
 
         function addLegend() {
             const legend = L.control({position: 'bottomright'});
-            
             legend.onAdd = function (map) {
                 const div = L.DomUtil.create('div', 'legend');
-                div.innerHTML = '<h4>Leyenda</h4>';
-                
-                // Obtener tipos únicos y sus colores
-                const uniqueTypes = [...new Set(restrictionsData.map(item => item.tipo_restriccion))];
-                
-                // Mapeo de colores según tipo
-                const typeColors = {
-                    'ambiental': '#3498db',
-                    'forestal': '#3498db',
-                    'hidrica': '#e74c3c',
-                    'fauna': '#27ae60',
-                    'urbana': '#8e44ad',
-                    'cultural': '#1abc9c',
-                    'otros': '#95a5a6'
-                };
-                
-                // Generar leyenda dinámica
-                uniqueTypes.forEach(type => {
-                    let color = typeColors.default; // Color por defecto
-                    
-                    // Buscar color específico según tipo
-                    for (const key in typeColors) {
-                        if (type.toLowerCase().includes(key)) {
-                            color = typeColors[key];
-                            break;
-                        }
-                    }
-                    
-                    div.innerHTML += `<i style="background:${color}"></i> ${type}<br>`;
-                });
-                
+                div.innerHTML = '<h4>Leyenda</h4>' +
+                    '<i style="background:#3498db"></i> Ambiental/Forestal<br>' +
+                    '<i style="background:#e74c3c"></i> Hídrica<br>' +
+                    '<i style="background:#27ae60"></i> Fauna<br>' +
+                    '<i style="background:#8e44ad"></i> Urbana<br>' +
+                    '<i style="background:#1abc9c"></i> Cultural<br>' +
+                    '<i style="background:#95a5a6"></i> Otros<br>';
                 return div;
             };
-            
             legend.addTo(map);
         }
 
@@ -1134,10 +1062,8 @@
                     { 
                         data: "pais_restriccion", 
                         title: "País",
-                        render: function(data,type, row) {
-                            return `<span class="fw-bold">
-                                <a href="${row.link_entregable}">${data}</a>
-                                </span>`;
+                        render: function(data) {
+                            return `<span class="fw-bold">${data}</span>`;
                         }
                     },
                     { 
@@ -1168,7 +1094,15 @@
                         data: "tipo_restriccion", 
                         title: "Tipo",
                         render: function(data) {
-                            return `<span class="badge ${getBadgeClass(data)}">${data}</span>`;
+                            let badgeClass = 'badge-otros';
+                            if (data.includes('ambiental') || data.includes('forestal')) {
+                                badgeClass = 'badge-ap';
+                            } else if (data.includes('hidrica')) {
+                                badgeClass = 'badge-buffer';
+                            } else if (data.includes('fauna')) {
+                                badgeClass = 'badge-success';
+                            }
+                            return `<span class="badge ${badgeClass}">${data}</span>`;
                         }
                     },
                     { 
@@ -1244,17 +1178,11 @@
         }
 
         function populateFilters() {
-            // Limpiar opciones existentes
-            $('#countryFilter').empty().append('<option value="">Todos los países</option>');
-            $('#typeFilter').empty().append('<option value="">Todos los tipos</option>');
-            
-            // Obtener países únicos
             const countries = [...new Set(restrictionsData.map(item => item.pais_restriccion))].sort();
             countries.forEach(country => {
                 $('#countryFilter').append(`<option value="${country}">${country}</option>`);
             });
             
-            // Obtener tipos de restricción únicos
             const types = [...new Set(restrictionsData.map(item => item.tipo_restriccion))].sort();
             types.forEach(type => {
                 $('#typeFilter').append(`<option value="${type}">${type}</option>`);
@@ -1349,17 +1277,13 @@
         function updateStats() {
             const total = filteredData.length;
             const eudr = filteredData.filter(item => item.pertinencia_eudr).length;
-            
-            // Contar tipos de restricción dinámicamente
-            const environmental = filteredData.filter(item => {
-                const type = item.tipo_restriccion.toLowerCase();
-                return type.includes('ambiental') || type.includes('forestal');
-            }).length;
-            
-            const water = filteredData.filter(item => {
-                const type = item.tipo_restriccion.toLowerCase();
-                return type.includes('hidrica');
-            }).length;
+            const environmental = filteredData.filter(item => 
+                item.tipo_restriccion.includes('ambiental') || 
+                item.tipo_restriccion.includes('forestal')
+            ).length;
+            const water = filteredData.filter(item => 
+                item.tipo_restriccion.includes('hidrica')
+            ).length;
             
             $('#totalRestrictions').text(total);
             $('#highEudr').text(eudr);
@@ -1430,18 +1354,18 @@
                             <p><strong><i class="fas fa-flag"></i> País:</strong> ${item.pais_restriccion}</p>
                             <p><strong><i class="fas fa-id-card"></i> ID Restricción:</strong> <code>${item.ip_restriccion}</code></p>
                             <p><strong><i class="fas fa-book"></i> Normativa:</strong> <a href="${item.enlace_norma}" target="_blank" class="text-decoration-none">${item.normativa_aplicable}</a></p>
-                            <p><strong><i class="fas fa-file-alt"></i> Artículo:</strong> ${item.articulo_norma || "No especificado"}</p>
-                            <p><strong><i class="fas fa-calendar-alt"></i> Fecha Norma:</strong> ${item.fecha_norma || "No especificado"}</p>
-                            <p><strong><i class="fas fa-building"></i> Institución Responsable:</strong> ${item.institucion_responsable || "No especificado"}</p>
-                            <p><strong><i class="fas fa-map-marker-alt"></i> Nivel/Escala:</strong> ${item.nivel_escala || "No especificado"}</p>
+                            <p><strong><i class="fas fa-file-alt"></i> Artículo:</strong> ${item.articulo_norma}</p>
+                            <p><strong><i class="fas fa-calendar-alt"></i> Fecha Norma:</strong> ${item.fecha_norma}</p>
+                            <p><strong><i class="fas fa-building"></i> Institución Responsable:</strong> ${item.institucion_responsable}</p>
+                            <p><strong><i class="fas fa-map-marker-alt"></i> Nivel/Escala:</strong> ${item.nivel_escala}</p>
                         </div>
                         <div class="col-md-6">
                             <h5><i class="fas fa-tools"></i> Detalles Técnicos</h5>
                             <hr>
                             <p><strong><i class="fas fa-layer-group"></i> Tipo de Restricción:</strong> <span class="badge ${getBadgeClass(item.tipo_restriccion)}">${item.tipo_restriccion}</span></p>
                             <p><strong><i class="fas fa-check-circle"></i> Cuantificable:</strong> ${item.cuantificable ? 'Sí' : 'No'}</p>
-                            <p><strong><i class="fas fa-ruler"></i> Parámetros Geográficos:</strong> ${item.parametros_geo || "No especificado"}</p>
-                            <p><strong><i class="fas fa-draw-polygon"></i> Representación:</strong> ${item.representacion || "No especificado"}</p>
+                            <p><strong><i class="fas fa-ruler"></i> Parámetros Geográficos:</strong> ${item.parametros_geo}</p>
+                            <p><strong><i class="fas fa-draw-polygon"></i> Representación:</strong> ${item.representacion}</p>
                             <p><strong><i class="fas fa-chart-line"></i> Tipo de Análisis:</strong> ${item.tipo_analisis || "No especificado"}</p>
                         </div>
                     </div>
@@ -1522,37 +1446,6 @@
             
             $('#map-tab').tab('show');
             
-            // Obtener coordenadas dinámicamente desde los datos
-            const countryData = restrictionsData.find(item => item.pais_restriccion === country);
-            let center = [-15.0, -60.0]; // Coordenadas por defecto (Sudamérica)
-            
-            if (countryData && countryData.coordenadas_centro) {
-                // Si hay coordenadas específicas en los datos
-                const coords = countryData.coordenadas_centro.split(',');
-                if (coords.length === 2) {
-                    center = [parseFloat(coords[0]), parseFloat(coords[1])];
-                }
-            } else {
-                // Coordenadas predefinidas para países comunes
-                const predefinedCenters = {
-                    "Chile": [-35.0, -71.0],
-                    "Perú": [-13.0, -74.0],
-                    "Colombia": [4.0, -73.0],
-                    "Brasil": [-10.0, -55.0],
-                    "México": [19.0, -99.0],
-                    "Argentina": [-40.0, -72.0],
-                    "Ecuador": [-2.0, -44.0]
-                };
-                
-                if (predefinedCenters[country]) {
-                    center = predefinedCenters[country];
-                }
-            }
-            
-            if (center) {
-                map.setView(center, 9);
-            }
-            
             // Activar la capa correspondiente si existe
             if (id_layer && geojsonLayers[id_layer]) {
                 const layerInfo = geojsonLayers[id_layer];
@@ -1563,25 +1456,67 @@
                 }
                 
                 // Ajustar el mapa a los límites de la capa
-                map.fitBounds(layerInfo.layer.getBounds());
+                try {
+                    map.fitBounds(layerInfo.layer.getBounds(), {
+                        padding: [20, 20] // Añadir padding para mejor visualización
+                    });
+                } catch (e) {
+                    console.error("Error al ajustar los límites de la capa:", e);
+                    // Si falla, centrar en el país
+                    centerMapOnCountry(country);
+                }
+            } else {
+                // Si no hay capa, centrar en el país
+                centerMapOnCountry(country);
+            }
+        }
+
+        function centerMapOnCountry(country) {
+            let center;
+            let zoom = 6; // Zoom por defecto
+            
+            // Coordenadas centrales para cada país
+            const countryCenters = {
+                "Chile": { center: [-35.0, -71.0], zoom: 5 },
+                "Perú": { center: [-13.0, -74.0], zoom: 6 },
+                "Colombia": { center: [4.0, -73.0], zoom: 6 },
+                "Brasil": { center: [-10.0, -55.0], zoom: 5 },
+                "México": { center: [19.0, -99.0], zoom: 5 },
+                "Argentina": { center: [-40.0, -72.0], zoom: 5 },
+                "Ecuador": { center: [-2.0, -44.0], zoom: 7 },
+                "Bolivia": { center: [-17.0, -65.0], zoom: 6 },
+                "Venezuela": { center: [8.0, -66.0], zoom: 6 },
+                "Paraguay": { center: [-23.0, -58.0], zoom: 7 },
+                "Uruguay": { center: [-33.0, -56.0], zoom: 8 },
+                "Guyana": { center: [5.0, -58.0], zoom: 7 },
+                "Surinam": { center: [4.0, -56.0], zoom: 7 },
+                "Guayana Francesa": { center: [4.0, -53.0], zoom: 8 }
+            };
+            
+            if (countryCenters[country]) {
+                center = countryCenters[country].center;
+                zoom = countryCenters[country].zoom;
+            } else {
+                console.warn(`No se ha definido un centro para el país: ${country}`);
+                // Coordenadas por defecto para Sudamérica
+                center = [-15.0, -60.0];
+                zoom = 4;
+            }
+            
+            if (center) {
+                map.setView(center, zoom);
             }
         }
 
         function getBadgeClass(type) {
-            const typeLower = type.toLowerCase();
-            
-            if (typeLower.includes('ambiental') || typeLower.includes('forestal')) {
-                return 'badge-ap';
-            } else if (typeLower.includes('hidrica')) {
-                return 'badge-buffer';
-            } else if (typeLower.includes('fauna')) {
-                return 'badge-success';
-            } else if (typeLower.includes('urbana')) {
-                return 'badge-warning';
-            } else if (typeLower.includes('cultural')) {
-                return 'badge-info';
+            if (type.includes('ambiental') || type.includes('forestal')) {
+                return 'bg-primary';
+            } else if (type.includes('hidrica')) {
+                return 'bg-danger';
+            } else if (type.includes('fauna')) {
+                return 'bg-success';
             } else {
-                return 'badge-otros';
+                return 'bg-secondary';
             }
         }
 
