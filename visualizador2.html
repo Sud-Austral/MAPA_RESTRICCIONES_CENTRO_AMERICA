@@ -632,10 +632,14 @@
         
         // Cargar las capas iniciales
         const initialLayers = [
-            { name: 'Áreas de Conservación Voluntaria', url: 'https://raw.githubusercontent.com/Sud-Austral/MAPA_RESTRICCIONES_CENTRO_AMERICA/refs/heads/main/mapaData/MEX_AreasConserVoluntaria.json', color: predefinedColors.MEX_AreasConserVoluntaria },
-            { name: 'Áreas Protegidas', url: 'https://raw.githubusercontent.com/Sud-Austral/MAPA_RESTRICCIONES_CENTRO_AMERICA/refs/heads/main/mapaData/MEX_AreasProt.json', color: predefinedColors.MEX_AreasProt },
-            { name: 'Buffer Costa', url: 'https://raw.githubusercontent.com/Sud-Austral/MAPA_RESTRICCIONES_CENTRO_AMERICA/refs/heads/main/mapaData/MEX_Buffer_costa.json', color: predefinedColors.MEX_Buffer_costa },
-            { name: 'Buffer Hidrográfico', url: 'https://raw.githubusercontent.com/Sud-Austral/MAPA_RESTRICCIONES_CENTRO_AMERICA/refs/heads/main/mapaData/MEX_Buffer_hidro.json', color: predefinedColors.MEX_Buffer_hidro }
+            { id_layer: "layer001",name: 'Áreas de Conservación Voluntaria', url: 'https://raw.githubusercontent.com/Sud-Austral/MAPA_RESTRICCIONES_CENTRO_AMERICA/refs/heads/main/mapaData/MEX_AreasConserVoluntaria.json', color: predefinedColors.MEX_AreasConserVoluntaria },
+            { id_layer: "layer002",name: 'Áreas Protegidas', url: 'https://raw.githubusercontent.com/Sud-Austral/MAPA_RESTRICCIONES_CENTRO_AMERICA/refs/heads/main/mapaData/MEX_AreasProt.json', color: predefinedColors.MEX_AreasProt },
+            { id_layer: "layer003",name: 'Buffer Costa', url: 'https://raw.githubusercontent.com/Sud-Austral/MAPA_RESTRICCIONES_CENTRO_AMERICA/refs/heads/main/mapaData/MEX_Buffer_costa.json', color: predefinedColors.MEX_Buffer_costa },
+            { id_layer: "layer004",name: 'Buffer Hidrográfico', url: 'https://raw.githubusercontent.com/Sud-Austral/MAPA_RESTRICCIONES_CENTRO_AMERICA/refs/heads/main/mapaData/MEX_Buffer_hidro.json', color: predefinedColors.MEX_Buffer_hidro },
+            { id_layer: "layer005",name: 'Áreas de Conservación Voluntaria2', url: 'https://raw.githubusercontent.com/Sud-Austral/MAPA_RESTRICCIONES_CENTRO_AMERICA/refs/heads/main/mapaData/MEX_AreasConserVoluntaria.json', color: predefinedColors.MEX_AreasConserVoluntaria },
+            { id_layer: "layer006",name: 'Áreas de Conservación Voluntaria3', url: 'https://raw.githubusercontent.com/Sud-Austral/MAPA_RESTRICCIONES_CENTRO_AMERICA/refs/heads/main/mapaData/MEX_AreasConserVoluntaria.json', color: predefinedColors.MEX_AreasConserVoluntaria },
+            { id_layer: "layer007",name: 'Áreas de Conservación Voluntaria4', url: 'https://raw.githubusercontent.com/Sud-Austral/MAPA_RESTRICCIONES_CENTRO_AMERICA/refs/heads/main/mapaData/MEX_AreasConserVoluntaria.json', color: predefinedColors.MEX_AreasConserVoluntaria }
+            
         ];
         
         totalInitialLayers = initialLayers.length;
