@@ -841,6 +841,7 @@
         }
 
         // Función para obtener respuesta de la API de Gemini
+        /*
         async function obtenerRespuesta(pregunta) {
             // Agregar la pregunta del usuario al historial
             historialConversacion.push({
@@ -1029,7 +1030,193 @@
                 };
             }
         }
+        */
+        async function obtenerRespuesta(pregunta) {
+            // Agregar la pregunta del usuario al historial
+            historialConversacion.push({
+                role: "user",
+                content: pregunta
+            });
 
+            // Crear el prompt con la base de datos y la pregunta
+            const promptBase = `Eres un asistente experto en el Reglamento Europeo sobre Productos Libres de Deforestación.
+            El Reglamento Europeo sobre Productos Libres de Deforestación (también conocido como Reglamento de Deforestación Importada) es una normativa de la Unión Europea diseñada para reducir la contribución de los productos importados a la deforestación y la degradación forestal en el mundo. Su objetivo principal es asegurar que los productos que se venden en la UE no provengan de tierras deforestadas ilegalmente o recientemente.
+            Aquí te explico los puntos clave:
+            1. Objetivo
+            Garantizar que los productos comercializados en la UE no provengan de bosques talados ilegalmente o de tierras deforestadas después de una fecha límite específica.
+            Contribuir a la lucha contra el cambio climático y la pérdida de biodiversidad.
+            2. Productos cubiertos
+            El reglamento se aplica a productos de alto riesgo de deforestación, entre los que se incluyen:
+            Aceite de palma
+            Soja
+            Carne de res
+            Madera y productos de madera
+            Café
+            Cacao
+            Caucho
+            Productos derivados como chocolate, muebles, cuero, y algunos productos de papel
+            3. Obligaciones para los operadores
+            Los importadores y comerciantes que venden estos productos en la UE deben diligenciar y demostrar que sus productos son "libres de deforestación".
+            Deben proporcionar información geográfica sobre el origen de los productos y garantizar que se han producido legalmente y no contribuyen a la deforestación reciente.
+            4. Sistema de control
+            Los operadores deben usar un sistema de diligencia debida que incluye:
+            Información sobre la ubicación exacta de la producción.
+            Evaluación de riesgos de deforestación.
+            Medidas para mitigar cualquier riesgo identificado.
+            La autoridad de cada país de la UE puede auditar y sancionar en caso de incumplimiento.
+            5. Fecha de entrada en vigor
+            El reglamento fue adoptado en 2023 y está previsto que su aplicación completa comience en 2024, con etapas de implementación progresivas.
+            6. Impacto esperado
+            Incentivar prácticas agrícolas y forestales sostenibles.
+            Reducir la presión sobre los bosques tropicales y ecosistemas frágiles.
+            Aumentar la transparencia en las cadenas de suministro globales.
+            Tu función es responder preguntas basándote exclusivamente en la siguiente base de datos:
+
+            ${JSON.stringify(datos)}
+
+            Instrucciones:
+            1. Responde de manera clara, concisa y amigable.
+            2. Si la información para responder la pregunta está en la base de datos, úsala. También puedes usar información del prompt inicial.
+            3. Si la información no está en la base de datos, indica amablemente que no tienes esa información específica.
+            4. Mantén un tono profesional pero accesible y usa emojis ocasionalmente.
+            5. No inventes información que no esté en la base de datos.
+            6. Puedes hacer referencia a los IDs de restricción o datos cuando sea relevante.
+            7. Usa formato de texto enriquecido cuando sea apropiado (**negrita**, *cursiva*).
+            8. Cuando menciones un área protegida o dato específico que tenga un enlace, incluye su nombre exactamente como aparece en la base de datos para que pueda ser identificado como enlace.
+            9. Después de tu respuesta, genera exactamente 3 preguntas de seguimiento que el usuario podría hacer para profundizar en el tema. Estas preguntas deben estar basadas en la conversación actual y en la información proporcionada.
+            10. Si la pregunta del usuario es ambigua, poco clara o puede interpretarse de varias maneras, pide amablemente que la aclare antes de responder. Usa frases como "¿Podrías especificar a qué te refieres con…?" o "Para responder con precisión, necesito un poco más de detalle sobre…".
+            11. Evita adivinar la intención del usuario cuando la pregunta no esté clara; siempre solicita la aclaración necesaria antes de dar información.
+
+            Formato de respuesta:
+            [RESPUESTA]
+            ...tu respuesta aquí...
+            [/RESPUESTA]
+
+            [PREGUNTAS]
+            1. Primera pregunta de seguimiento
+            2. Segunda pregunta de seguimiento
+            3. Tercera pregunta de seguimiento
+            [/PREGUNTAS]
+
+            Pregunta del usuario: ${pregunta}`;
+
+            // Preparar mensajes con el historial (máximo últimas 10 interacciones)
+            const historialReciente = historialConversacion.slice(-10);
+            const mensajes = [
+                {
+                    role: "user",
+                    content: promptBase
+                },
+                ...historialReciente
+            ];
+
+            const requestBody = {
+                model: "glm-4.5-flash",
+                messages: mensajes,
+                temperature: 0.7,
+                max_tokens: 3000
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error en la petición: ${response.status} ${response.statusText}`);
+                }
+
+                const dataResp = await response.json();
+
+                // Manejo seguro de la respuesta
+                if (dataResp?.choices?.[0]?.message?.content) {
+                    const respuestaCompleta = dataResp.choices[0].message.content.trim();
+                    
+                    // Extraer la respuesta principal y las preguntas
+                    let respuestaPrincipal = "";
+                    let preguntasSeguimiento = [];
+                    console.log(respuestaCompleta);
+                    
+                    // Parsear la respuesta - manejo robusto de etiquetas
+                    const respuestaMatch = respuestaCompleta.match(/\[RESPUESTA\]([\s\S]*?)\[\/RESPUESTA\]/i);
+                    if (respuestaMatch && respuestaMatch[1]) {
+                        respuestaPrincipal = respuestaMatch[1].trim();
+                    } else {
+                        // Si no se encuentra el formato, buscar sin etiqueta de cierre
+                        const respuestaSinCierre = respuestaCompleta.match(/\[RESPUESTA\]([\s\S]*?)(?=\[PREGUNTAS\]|$)/i);
+                        if (respuestaSinCierre && respuestaSinCierre[1]) {
+                            respuestaPrincipal = respuestaSinCierre[1].trim();
+                        } else {
+                            // Si no se encuentra, quitar cualquier etiqueta y mostrar todo
+                            respuestaPrincipal = respuestaCompleta.replace(/\[\/?RESPUESTA\]/gi, '').trim();
+                        }
+                    }
+                    
+                    const preguntasMatch = respuestaCompleta.match(/\[PREGUNTAS\]([\s\S]*?)\[\/PREGUNTAS\]/i);
+                    if (preguntasMatch && preguntasMatch[1]) {
+                        // Extraer las preguntas numeradas
+                        const lineas = preguntasMatch[1].split('\n');
+                        for (const linea of lineas) {
+                            const match = linea.match(/^\d+\.\s*(.+)$/);
+                            if (match && match[1]) {
+                                preguntasSeguimiento.push(match[1].trim());
+                            }
+                        }
+                        
+                        // Si no se extrajeron suficientes preguntas, generar algunas genéricas
+                        if (preguntasSeguimiento.length < 3) {
+                            const preguntasGenericas = [
+                                "¿Puedes darme más detalles sobre este tema?",
+                                "¿Cómo se relaciona esto con otras áreas protegidas?",
+                                "¿Qué implicaciones tiene esto para el cumplimiento del EUDR?"
+                            ];
+                            
+                            while (preguntasSeguimiento.length < 3) {
+                                preguntasSeguimiento.push(preguntasGenericas[preguntasSeguimiento.length]);
+                            }
+                        }
+                    } else {
+                        // Si no se encuentran preguntas, generar algunas genéricas
+                        preguntasSeguimiento = [
+                            "¿Puedes darme más detalles sobre este tema?",
+                            "¿Cómo se relaciona esto con otras áreas protegidas?",
+                            "¿Qué implicaciones tiene esto para el cumplimiento del EUDR?"
+                        ];
+                    }
+                    
+                    // Agregamos los enlaces a la respuesta principal
+                    respuestaPrincipal = agregarEnlacesARespuesta(respuestaPrincipal);
+                    
+                    // Agregar la respuesta del modelo al historial (solo la respuesta principal)
+                    historialConversacion.push({
+                        role: "assistant",
+                        content: respuestaPrincipal
+                    });
+
+                    return {
+                        respuesta: respuestaPrincipal,
+                        preguntas: preguntasSeguimiento
+                    };
+                } else {
+                    throw new Error("Respuesta inesperada de la API de Z.AI");
+                }
+            } catch (error) {or("Error al llamar a la API de Z.AI:", error);
+                return {
+                    respuesta: "Lo siento, ocurrió un error al procesar tu pregunta. 😔 Por favor, intenta nuevamente más tarde o verifica tu conexión a internet.",
+                    preguntas: [
+                        "¿Qué áreas protegidas existen en Belice?",
+                        "¿Cuáles son las restricciones principales?",
+                        "¿Cómo se aplican los geoprocesos?"
+                    ]
+                };
+            }
+        }
+        
         // Función para limpiar el historial
         function limpiarHistorial() {
             historialConversacion = [];
