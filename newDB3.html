@@ -1379,7 +1379,7 @@
                 if (restriction.id_layer && restriction.url_geojson) {
                     addGeoJSONLayer(
                         restriction.id_layer, 
-                        restriction.descripcion_restriccion, 
+                        restriction.entregable, 
                         restriction.url_geojson
                     );
                 }
@@ -1718,7 +1718,7 @@
                 $('#countryFilter').append(`<option value="${country}">${country}</option>`);
             });
             
-            const types = [...new Set(restrictionsData.map(item => item.tipo_restriccion))].sort();
+            const types = [...new Set(restrictionsData.map(item => item.tipo_descrip))].sort();
             types.forEach(type => {
                 $('#typeFilter').append(`<option value="${type}">${type}</option>`);
             });
@@ -1827,7 +1827,7 @@
             
             filteredData = restrictionsData.filter(item => {
                 const countryMatch = !countryFilter || item.pais === countryFilter;
-                const typeMatch = !typeFilter || item.tipo_restriccion === typeFilter;
+                const typeMatch = !typeFilter || item.tipo_descrip === typeFilter;
                 const eudrValue = eudrFilter.val();
                 const eudrMatch = !eudrValue || item.eudr_cat === eudrValue;
 
