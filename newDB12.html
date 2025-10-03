@@ -1596,7 +1596,8 @@
                     if (restriction.id_layer && restriction.url_geojson) {
                         this.addGeoJSONLayer(
                             restriction.id_layer,
-                            restriction.entregable || restriction.nombre_del_dataset,
+                            //restriction.entregable || restriction.nombre_del_dataset,
+                            restriction.entregable,
                             restriction.url_geojson
                         ).then(() => {
                             loadedLayers++;
