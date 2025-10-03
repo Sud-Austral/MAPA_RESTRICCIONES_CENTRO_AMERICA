@@ -785,7 +785,7 @@
             box-shadow: var(--card-shadow);
             margin-bottom: 2rem;
             border-top: 5px solid var(--secondary-color);
-            height: 700px;
+            height: 120vh;
             display: flex;
             flex-direction: column;
         }
@@ -1236,18 +1236,18 @@
             </div>
         </div>
 
-        <!-- Pestañas para Mapa, Tabla y Chat -->
+        <!-- Pestañas para Tabla, Mapa y Chat -->
         <div class="row">
             <div class="col-12">
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="map-tab" data-bs-toggle="tab" data-bs-target="#map-tab-pane" type="button" role="tab" aria-controls="map-tab-pane" aria-selected="true">
-                            <i class="fas fa-map"></i> Vista Geográfica
+                        <button class="nav-link active" id="table-tab" data-bs-toggle="tab" data-bs-target="#table-tab-pane" type="button" role="tab" aria-controls="table-tab-pane" aria-selected="true">
+                            <i class="fas fa-table"></i> Vista Tabular
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="table-tab" data-bs-toggle="tab" data-bs-target="#table-tab-pane" type="button" role="tab" aria-controls="table-tab-pane" aria-selected="false">
-                            <i class="fas fa-table"></i> Vista Tabular
+                        <button class="nav-link" id="map-tab" data-bs-toggle="tab" data-bs-target="#map-tab-pane" type="button" role="tab" aria-controls="map-tab-pane" aria-selected="false">
+                            <i class="fas fa-map"></i> Vista Geográfica
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
@@ -1257,63 +1257,8 @@
                     </li>
                 </ul>
                 <div class="tab-content" id="myTabContent">
-                    <!-- Pestaña del Mapa -->
-                    <div class="tab-pane fade show active" id="map-tab-pane" role="tabpanel" aria-labelledby="map-tab" tabindex="0">
-                        <div class="map-container slide-up">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <h3><i class="fas fa-layer-group"></i> Capas Geográficas</h3>
-                                    <div id="map">
-                                        <div class="loading-overlay" id="map-loading">
-                                            <div class="spinner"></div>
-                                            <p class="mt-3">Cargando mapa...</p>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Botón para abrir/cerrar panel de capas -->
-                                    <button id="toggleLayersPanel" class="toggle-layers-panel" title="Mostrar/Ocultar panel de capas">
-                                        <i class="fas fa-layer-group"></i>
-                                    </button>
-                                    
-                                    <!-- Panel de control de capas -->
-                                    <div class="control-panel" id="layersPanel">
-                                        <div class="control-panel-content">
-                                            <h4><i class="fas fa-layer-group me-2"></i> Capas GeoJSON</h4>
-                                            
-                                            <div class="mb-3">
-                                                <input type="text" id="searchLayers" class="form-control form-control-sm" placeholder="Buscar capas...">
-                                            </div>
-                                            
-                                            <div id="layers-list">
-                                                <div class="empty-state">
-                                                    <i class="fas fa-map-marked-alt"></i>
-                                                    <p>Cargando capas...</p>
-                                                </div>
-                                            </div>
-                                            
-                                            <button id="reload-btn" class="reload-btn">
-                                                <i class="fas fa-sync-alt me-2"></i> Recargar Capas
-                                            </button>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="map-info">
-                                        <h5><i class="fas fa-info-circle"></i> Información del Mapa</h5>
-                                        <p>Este mapa muestra las restricciones legales georreferenciadas para el cumplimiento del EUDR. 
-                                           Puede activar/desactivar las diferentes capas desde el panel de control. 
-                                           Haga clic en cualquier polígono para ver información detallada.</p>
-                                        <div id="featureInfo" class="feature-info" style="display: none;">
-                                            <h6><i class="fas fa-map-marker-alt"></i> Detalle de la Restricción Seleccionada</h6>
-                                            <div id="featureContent"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
                     <!-- Pestaña de la Tabla -->
-                    <div class="tab-pane fade" id="table-tab-pane" role="tabpanel" aria-labelledby="table-tab" tabindex="0">
+                    <div class="tab-pane fade show active" id="table-tab-pane" role="tabpanel" aria-labelledby="table-tab" tabindex="0">
                         <div class="row">
                             <div class="col-lg-3 col-md-6 mb-4">
                                 <div class="card stats-card" id="totalRestrictionsCard">
@@ -1393,12 +1338,67 @@
                         </div>
                     </div>
                     
+                    <!-- Pestaña del Mapa -->
+                    <div class="tab-pane fade" id="map-tab-pane" role="tabpanel" aria-labelledby="map-tab" tabindex="0">
+                        <div class="map-container slide-up">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3><i class="fas fa-layer-group"></i> Capas Geográficas</h3>
+                                    <div id="map">
+                                        <div class="loading-overlay" id="map-loading">
+                                            <div class="spinner"></div>
+                                            <p class="mt-3">Cargando mapa...</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Botón para abrir/cerrar panel de capas -->
+                                    <button id="toggleLayersPanel" class="toggle-layers-panel" title="Mostrar/Ocultar panel de capas">
+                                        <i class="fas fa-layer-group"></i>
+                                    </button>
+                                    
+                                    <!-- Panel de control de capas -->
+                                    <div class="control-panel" id="layersPanel">
+                                        <div class="control-panel-content">
+                                            <h4><i class="fas fa-layer-group me-2"></i> Capas GeoJSON</h4>
+                                            
+                                            <div class="mb-3">
+                                                <input type="text" id="searchLayers" class="form-control form-control-sm" placeholder="Buscar capas...">
+                                            </div>
+                                            
+                                            <div id="layers-list">
+                                                <div class="empty-state">
+                                                    <i class="fas fa-map-marked-alt"></i>
+                                                    <p>Cargando capas...</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <button id="reload-btn" class="reload-btn">
+                                                <i class="fas fa-sync-alt me-2"></i> Recargar Capas
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="map-info">
+                                        <h5><i class="fas fa-info-circle"></i> Información del Mapa</h5>
+                                        <p>Este mapa muestra las restricciones legales georreferenciadas para el cumplimiento del EUDR. 
+                                           Puede activar/desactivar las diferentes capas desde el panel de control. 
+                                           Haga clic en cualquier polígono para ver información detallada.</p>
+                                        <div id="featureInfo" class="feature-info" style="display: none;">
+                                            <h6><i class="fas fa-map-marker-alt"></i> Detalle de la Restricción Seleccionada</h6>
+                                            <div id="featureContent"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- Pestaña del Chat -->
                     <div class="tab-pane fade" id="chat-tab-pane" role="tabpanel" aria-labelledby="chat-tab" tabindex="0">
                         <div class="chat-container slide-up">
                             <h3><i class="fas fa-comments"></i> Asistente de Consultas</h3>
                             <p class="text-muted mb-4">Utilice este chat para realizar consultas sobre las restricciones legales y normativas del EUDR.</p>
-                            <iframe src="https://sud-austral.github.io/MAPA_RESTRICCIONES_CENTRO_AMERICA/chatBoton5.html" class="chat-iframe" title="Asistente de Consultas EUDR"></iframe>
+                            <iframe src="https://sud-austral.github.io/MAPA_RESTRICCIONES_CENTRO_AMERICA/chatBoton7.html" class="chat-iframe" title="Asistente de Consultas EUDR"></iframe>
                         </div>
                     </div>
                 </div>
@@ -1517,6 +1517,8 @@
         let map;
         let currentFeature = null;
         let geojsonLayers = {};
+        let mapInitialized = false;
+        let currentRestriction = null;
 
         // =============================================
         // CLASE PRINCIPAL DE LA APLICACIÓN
@@ -1532,12 +1534,7 @@
                 this.populateFilters();
                 this.setupEventListeners();
                 this.updateStats();
-                this.initializeMap();
-                
-                // Ocultar el indicador de carga del mapa después de un tiempo
-                setTimeout(() => {
-                    $('#map-loading').fadeOut();
-                }, 1500);
+                // No inicializamos el mapa aquí, lo haremos cuando se active la pestaña
             }
 
             // =============================================
@@ -1545,6 +1542,8 @@
             // =============================================
 
             initializeMap() {
+                if (mapInitialized) return;
+                
                 map = L.map('map').setView(CONFIG.MAP.CENTER, CONFIG.MAP.ZOOM);
 
                 // Capa base
@@ -1561,6 +1560,11 @@
                 map.on('click', () => {
                     this.hideFeatureInfo();
                 });
+
+                mapInitialized = true;
+                
+                // Ocultar el indicador de carga del mapa
+                $('#map-loading').fadeOut();
             }
 
             addLegend() {
@@ -1663,7 +1667,6 @@
                 // Evento de clic en la capa
                 layer.on('click', (e) => {
                     const restriction = restrictionsData.find(r => r.id_layer === id);
-                    console.log(restriction,id)
                     if (restriction) {
                         this.showFeatureInfo(restriction);
                     }
@@ -2020,7 +2023,7 @@
                     <button class="btn btn-sm btn-outline-success export-row" data-id="${row.ip_restriccion}" title="Exportar">
                         <i class="fas fa-download"></i>
                     </button>
-                    <button class="btn btn-sm btn-outline-info view-on-map" data-country="${row.pais}" data-type="${row.tipo_restriccion}" data-id_layer="${row.id_layer}" title="Ver en mapa">
+                    <button class="btn btn-sm btn-outline-info view-on-map" data-country="${row.pais}" data-type="${row.tipo_restriccion}" data-id_layer="${row.id_layer}" data-id="${row.ip_restriccion}" title="Ver en mapa">
                         <i class="fas fa-map-marked-alt"></i>
                     </button>
                 `;
@@ -2041,8 +2044,9 @@
                         const country = $target.data('country');
                         const type = $target.data('type');
                         const id_layer = $target.data('id_layer');
+                        const id = $target.data('id');
                         $('#map-tab').tab('show');
-                        this.viewOnMap(country, type, id_layer);
+                        this.viewOnMap(country, type, id_layer, id);
                     });
             }
 
@@ -2066,6 +2070,18 @@
 
                 // Recargar capas
                 document.getElementById('reload-btn').addEventListener('click', () => this.reloadLayers());
+
+                // Evento para cuando se active la pestaña del mapa
+                $('#map-tab').on('shown.bs.tab', (e) => {
+                    if (!mapInitialized) {
+                        this.initializeMap();
+                    } else {
+                        // Si el mapa ya está inicializado, actualizamos su tamaño
+                        setTimeout(() => {
+                            map.invalidateSize();
+                        }, 100);
+                    }
+                });
 
                 // Tarjetas de estadísticas clickeables
                 $('#totalRestrictionsCard').click(() => {
@@ -2205,13 +2221,12 @@
             // =============================================
 
             showFeatureInfo(restriction) {
-                console.log("showFeatureInfo")
                 const content = `
                     <strong>${restriction.descripcion_restriccion}</strong><br>
                     <strong>País:</strong> ${restriction.pais}<br>
                     <strong>Tipo:</strong> ${restriction.tipo_restriccion}<br>
                     <strong>ID:</strong> ${restriction.ip_restriccion}<br>
-                    <button class="btn btn-sm btn-primary mt-2" onclick="app.viewOnMap('${restriction.pais}', '${restriction.tipo_restriccion}', '${restriction.id_layer}')">Ver en Mapa</button>
+                    <button class="btn btn-sm btn-primary mt-2" onclick="app.viewOnMap('${restriction.pais}', '${restriction.tipo_restriccion}', '${restriction.id_layer}', '${restriction.ip_restriccion}')">Ver en Mapa</button>
                     <button class="btn btn-sm btn-outline-primary mt-2 ms-1" onclick="app.showDetailForId('${restriction.ip_restriccion}')">Ver Detalle</button>
                 `;
                 $('#featureContent').html(content);
@@ -2249,7 +2264,7 @@
                 });
             }
 
-            viewOnMap(country, type, id_layer) {
+            viewOnMap(country, type, id_layer, restrictionId) {
                 // Cerrar modal si está abierto
                 const detailModal = document.getElementById('detailModal');
                 const modalInstance = bootstrap.Modal.getInstance(detailModal);
@@ -2259,22 +2274,33 @@
 
                 $('#map-tab').tab('show');
 
-                // Activar la capa correspondiente si existe
-                if (id_layer && geojsonLayers[id_layer]) {
-                    const layerInfo = geojsonLayers[id_layer];
-                    if (!layerInfo.visible) {
-                        this.toggleLayer(id_layer);
-                    }
+                // Esperar a que la pestaña del mapa se muestre
+                setTimeout(() => {
+                    // Activar la capa correspondiente si existe
+                    if (id_layer && geojsonLayers[id_layer]) {
+                        const layerInfo = geojsonLayers[id_layer];
+                        if (!layerInfo.visible) {
+                            this.toggleLayer(id_layer);
+                        }
 
-                    try {
-                        map.fitBounds(layerInfo.layer.getBounds(), { padding: [20, 20] });
-                    } catch (e) {
-                        console.error("Error al ajustar los límites de la capa:", e);
+                        try {
+                            map.fitBounds(layerInfo.layer.getBounds(), { padding: [20, 20] });
+                        } catch (e) {
+                            console.error("Error al ajustar los límites de la capa:", e);
+                            this.centerMapOnCountry(country);
+                        }
+                    } else {
                         this.centerMapOnCountry(country);
                     }
-                } else {
-                    this.centerMapOnCountry(country);
-                }
+                    
+                    // Mostrar la información de la restricción
+                    if (restrictionId) {
+                        const restriction = restrictionsData.find(row => row.ip_restriccion === restrictionId);
+                        if (restriction) {
+                            this.showFeatureInfo(restriction);
+                        }
+                    }
+                }, 300);
             }
 
             centerMapOnCountry(country) {
@@ -2351,7 +2377,7 @@
                     </div>
                     <div class="row mt-4">
                         <div class="col-12">
-                            <button class="btn btn-primary" onclick="app.viewOnMap('${item.pais}', '${item.tipo_restriccion}', '${item.id_layer}')">
+                            <button class="btn btn-primary" onclick="app.viewOnMap('${item.pais}', '${item.tipo_restriccion}', '${item.id_layer}', '${item.ip_restriccion}')">
                                 <i class="fas fa-map-marked-alt"></i> Ver esta restricción en el mapa
                             </button>
                         </div>
