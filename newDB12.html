@@ -1,0 +1,2758 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador de Restricciones Legales - EUDR</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+
+    <style>
+        /* ========================================
+        VARIABLES CSS
+        ======================================== */
+        :root {
+            --primary-color: #1a3a5f;
+            --secondary-color: #2c7be5;
+            --accent-color: #00d97e;
+            --danger-color: #e63757;
+            --warning-color: #f6c343;
+            --info-color: #39afd1;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ========================================
+        ESTILOS GENERALES
+        ======================================== */
+        body {
+            font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+            background-color: #f5f7fb;
+            color: #334e68;
+            line-height: 1.6;
+            letter-spacing: -0.01em;
+        }
+
+        .container {
+            max-width: 1400px;
+        }
+
+        /* ========================================
+        HEADER
+        ======================================== */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), #0d2341);
+            color: white;
+            padding: 2.5rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></svg>');
+            opacity: 0.3;
+        }
+
+        .header h1 {
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            position: relative;
+            z-index: 1;
+            font-size: 2.2rem;
+        }
+
+        .header p {
+            position: relative;
+            z-index: 1;
+            opacity: 0.9;
+            font-size: 1.1rem;
+            max-width: 800px;
+        }
+
+        /* ========================================
+        FOOTER
+        ======================================== */
+        footer {
+            background-color: var(--primary-color);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 2.5rem 0;
+            margin-top: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        footer::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></svg>');
+            opacity: 0.2;
+        }
+
+        footer p {
+            position: relative;
+            z-index: 1;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        /* ========================================
+        SECCIÓN DE FILTROS
+        ======================================== */
+        .filter-section {
+            background-color: white;
+            padding: 1.8rem;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+            transition: var(--transition);
+            border-left: 5px solid var(--secondary-color);
+        }
+
+        .filter-section:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .filter-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .active-filters {
+            margin-top: 1.2rem;
+            padding: 1rem;
+            background-color: #f0f5ff;
+            border-radius: 8px;
+            display: none;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .filter-badge {
+            background-color: var(--secondary-color);
+            color: white;
+            border-radius: 20px;
+            padding: 0.4rem 0.9rem;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filter-badge:hover {
+            background-color: #1a68d4;
+            transform: translateY(-2px);
+        }
+
+        .filter-badge::after {
+            content: "×";
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* ========================================
+        FORMULARIOS
+        ======================================== */
+        .form-select,
+        .form-control {
+            border-radius: 10px;
+            border: 1px solid #dce2ec;
+            padding: 0.75rem 1rem;
+            transition: var(--transition);
+            font-size: 0.95rem;
+            background-color: #f8fafd;
+        }
+
+        .form-select:focus,
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.25rem rgba(44, 123, 229, 0.15);
+            outline: none;
+            background-color: white;
+        }
+
+        /* ========================================
+        BOTONES
+        ======================================== */
+        .btn {
+            border-radius: 10px;
+            padding: 0.65rem 1.5rem;
+            font-weight: 600;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            letter-spacing: 0.02em;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn i {
+            margin-right: 0.5rem;
+        }
+
+        .btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 0.25rem rgba(44, 123, 229, 0.15);
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1a68d4;
+            border-color: #1a68d4;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(44, 123, 229, 0.3);
+        }
+
+        .btn-outline-secondary {
+            border-color: #dce2ec;
+            color: #627792;
+            background-color: white;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: #f0f5ff;
+            border-color: var(--secondary-color);
+            color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-export {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-export:hover {
+            background-color: #00b868;
+            border-color: #00b868;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 217, 126, 0.3);
+        }
+
+        .btn-layer {
+            padding: 6px 10px;
+            font-size: 12px;
+            border-radius: 6px;
+            transition: var(--transition);
+        }
+
+        .btn-layer:hover {
+            transform: scale(1.1);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* ========================================
+        TARJETAS DE ESTADÍSTICAS
+        ======================================== */
+        .stats-card {
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            overflow: hidden;
+            border: none;
+            height: 100%;
+            background-color: white;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .stats-card .card-body {
+            padding: 1.8rem;
+            position: relative;
+        }
+
+        .stats-card .card-body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background-color: var(--secondary-color);
+        }
+
+        .stats-card:nth-child(2) .card-body::before {
+            background-color: var(--accent-color);
+        }
+
+        .stats-card:nth-child(3) .card-body::before {
+            background-color: var(--warning-color);
+        }
+
+        .stats-card:nth-child(4) .card-body::before {
+            background-color: var(--danger-color);
+        }
+
+        .stats-card .card-title {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .stats-card .card-text {
+            color: #627792;
+            font-size: 0.85rem;
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin: 0.5rem 0;
+            line-height: 1;
+        }
+
+        .stats-card:nth-child(2) .stats-number {
+            color: var(--accent-color);
+        }
+
+        .stats-card:nth-child(3) .stats-number {
+            color: var(--warning-color);
+        }
+
+        .stats-card:nth-child(4) .stats-number {
+            color: var(--danger-color);
+        }
+
+        /* ========================================
+        TABLAS
+        ======================================== */
+        .table-container {
+            background-color: white;
+            padding: 1.8rem;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            border-top: 5px solid var(--secondary-color);
+        }
+
+        .table th {
+            background-color: #f8fafd;
+            font-weight: 600;
+            color: var(--primary-color);
+            border-bottom: 2px solid #dce2ec;
+            padding: 1rem;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .table td {
+            padding: 1rem;
+            vertical-align: middle;
+            font-size: 0.9rem;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(44, 123, 229, 0.05);
+            cursor: pointer;
+        }
+
+        .table-striped > tbody > tr:nth-of-type(odd) > * {
+            background-color: rgba(240, 245, 255, 0.5);
+        }
+
+        /* ========================================
+        BADGES
+        ======================================== */
+        .badge {
+            font-weight: 500;
+            padding: 0.5rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            letter-spacing: 0.02em;
+        }
+
+        .badge-eudr {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .badge-buffer {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .badge-ap {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .badge-otros {
+            background-color: #627792;
+            color: white;
+        }
+
+        /* ========================================
+        PESTAÑAS (TABS)
+        ======================================== */
+        .nav-tabs {
+            border-bottom: none;
+            background-color: white;
+            border-radius: 12px 12px 0 0;
+            padding: 0.5rem 1rem;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-link {
+            color: #627792;
+            border: none;
+            border-bottom: 3px solid transparent;
+            border-radius: 0;
+            margin-right: 0.5rem;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            font-size: 0.9rem;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(44, 123, 229, 0.05);
+            color: var(--secondary-color);
+        }
+
+        .nav-link.active {
+            color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            background-color: transparent;
+        }
+
+        .nav-link::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background-color: var(--secondary-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        .tab-content {
+            padding: 1.8rem;
+            background-color: white;
+            border-radius: 0 0 16px 16px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .tab-pane {
+            animation: fadeIn 0.5s;
+        }
+
+        /* ========================================
+        MAPA
+        ======================================== */
+        #map {
+            height: 600px;
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+            z-index: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-container {
+            background-color: white;
+            padding: 1.8rem;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+            border-top: 5px solid var(--secondary-color);
+        }
+
+        .map-info {
+            margin-top: 1.5rem;
+            padding: 1.2rem;
+            background-color: #f0f5ff;
+            border-radius: 10px;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .legend {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            line-height: 24px;
+            color: #334e68;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .legend i {
+            width: 20px;
+            height: 20px;
+            float: left;
+            margin-right: 10px;
+            opacity: 0.8;
+            border-radius: 50%;
+        }
+
+        .leaflet-control-zoom {
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .leaflet-control-zoom a {
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        /* ========================================
+        PANEL DE CONTROL DE CAPAS
+        ======================================== */
+        .control-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            max-height: 85vh;
+            overflow-y: auto;
+            width: 320px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            transform: translateX(110%);
+        }
+
+        .control-panel.show {
+            transform: translateX(0);
+        }
+
+        .control-panel:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .control-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .control-panel::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .control-panel::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .control-panel::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .control-panel h4 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+        }
+
+        .control-panel h4 i {
+            margin-right: 10px;
+            color: var(--secondary-color);
+        }
+
+        .control-panel-content {
+            max-height: calc(85vh - 40px);
+            overflow-y: auto;
+        }
+
+        #layers-list {
+            max-height: calc(85vh - 200px);
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .layer-item {
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            background-color: #f8fafd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .layer-item:hover {
+            background-color: #f0f5ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .layer-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-right: 12px;
+            display: inline-block;
+            border: 2px solid white;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .layer-name {
+            flex-grow: 1;
+            font-weight: 500;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+
+        .layer-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .reload-btn {
+            width: 100%;
+            margin-top: 15px;
+            padding: 12px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .reload-btn:hover {
+            background-color: #1a68d4;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(44, 123, 229, 0.3);
+        }
+
+        .reload-btn i {
+            margin-right: 8px;
+        }
+
+        /* Botón para abrir/cerrar panel */
+        .toggle-layers-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            background-color: white;
+            border: none;
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+            transition: var(--transition);
+            color: var(--primary-color);
+        }
+
+        .toggle-layers-panel:hover {
+            background-color: var(--secondary-color);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px rgba(44, 123, 229, 0.3);
+        }
+
+        .toggle-layers-panel i {
+            font-size: 22px;
+        }
+
+        .control-panel.show ~ .toggle-layers-panel {
+            right: 360px;
+        }
+
+        /* ========================================
+        POPUPS DEL MAPA
+        ======================================== */
+        .popup-content {
+            max-height: 350px;
+            overflow-y: auto;
+            padding: 5px;
+        }
+
+        .popup-content div {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .popup-content div:last-child {
+            border-bottom: none;
+        }
+
+        .popup-content strong {
+            color: var(--primary-color);
+        }
+
+        /* ========================================
+        MODAL
+        ======================================== */
+        .modal-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+        }
+
+        .modal-content {
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .detail-modal .modal-dialog {
+            max-width: 90%;
+            max-height: 90vh;
+        }
+
+        .detail-content {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        /* ========================================
+        CHAT
+        ======================================== */
+        .chat-container {
+            background-color: white;
+            padding: 1.8rem;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+            border-top: 5px solid var(--secondary-color);
+            height: 700px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 10px;
+            flex-grow: 1;
+        }
+
+        /* ========================================
+        ESTADOS Y UTILIDADES
+        ======================================== */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            border-radius: 16px;
+            flex-direction: column;
+            backdrop-filter: blur(5px);
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            min-width: 350px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .loading-progress {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .loading-layers {
+            margin-top: 15px;
+            font-size: 15px;
+            color: #627792;
+        }
+
+        .loading-error {
+            margin-top: 15px;
+            color: var(--danger-color);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--secondary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 18px 25px;
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            z-index: 2000;
+            display: none;
+            max-width: 400px;
+            font-weight: 500;
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+
+        .notification.show {
+            display: block;
+            transform: translateY(0);
+            animation: pulse 2s infinite;
+        }
+
+        .notification.error {
+            background-color: var(--danger-color);
+        }
+
+        .notification i {
+            margin-right: 10px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #627792;
+            display: none;
+        }
+
+        .no-results i {
+            font-size: 4rem;
+            color: #dce2ec;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #627792;
+        }
+
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: #dce2ec;
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .feature-info {
+            padding: 1.2rem;
+            background-color: #f8fafd;
+            border-radius: 10px;
+            margin-top: 1.2rem;
+            border-left: 4px solid var(--secondary-color);
+            transition: var(--transition);
+        }
+
+        .feature-info:hover {
+            box-shadow: var(--card-shadow);
+        }
+
+        .search-highlight {
+            background-color: #fff3cd;
+            font-weight: bold;
+            padding: 0 3px;
+            border-radius: 3px;
+        }
+
+        .info-icon {
+            cursor: pointer;
+            color: var(--secondary-color);
+            margin-left: 5px;
+            transition: var(--transition);
+        }
+
+        .info-icon:hover {
+            color: #1a68d4;
+            transform: scale(1.2);
+        }
+
+        .country-flag {
+            width: 24px;
+            height: 16px;
+            margin-right: 8px;
+            border-radius: 3px;
+            object-fit: cover;
+        }
+
+        .priority-high {
+            background-color: #ffebee;
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .priority-medium {
+            background-color: #fff8e1;
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .priority-low {
+            background-color: #e8f5e8;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        /* ========================================
+        ANIMACIONES
+        ======================================== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 217, 126, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(0, 217, 126, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 217, 126, 0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .slide-up {
+            animation: slideUp 0.5s ease-in-out;
+        }
+
+        /* ========================================
+        RESPONSIVE DESIGN
+        ======================================== */
+        @media (max-width: 992px) {
+            .control-panel {
+                width: 280px;
+                right: 10px;
+                top: 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .stats-number {
+                font-size: 2rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+            }
+
+            .control-panel {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                width: auto;
+                max-height: 80vh;
+                z-index: 1000;
+            }
+
+            .control-panel-content {
+                max-height: calc(80vh - 40px);
+            }
+
+            #layers-list {
+                max-height: calc(80vh - 200px);
+            }
+
+            .control-panel.show ~ .toggle-layers-panel {
+                right: 20px;
+            }
+
+            #map {
+                height: 400px;
+            }
+
+            .toggle-layers-panel {
+                position: fixed;
+                bottom: 20px;
+                top: auto;
+                right: 20px;
+                z-index: 1001;
+            }
+
+            .chat-container {
+                height: 500px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .filter-section {
+                padding: 1.2rem;
+            }
+
+            .table-container {
+                padding: 1rem;
+            }
+
+            .tab-content {
+                padding: 1rem;
+            }
+
+            .map-container {
+                padding: 1rem;
+            }
+
+            .chat-container {
+                padding: 1rem;
+                height: 400px;
+            }
+
+            .notification {
+                right: 15px;
+                left: 15px;
+                max-width: none;
+            }
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1 class="display-5">Visualizador de Restricciones Legales</h1>
+            <p class="lead">Sistema de información geoespacial para el cumplimiento del Reglamento Europeo sobre Productos Libres de Deforestación (EUDR)</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="filter-section fade-in">
+                    <h3><i class="fas fa-filter"></i> Filtros de Búsqueda</h3>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="filter-group">
+                                <label for="countryFilter" class="form-label">País</label>
+                                <select id="countryFilter" class="form-select">
+                                    <option value="">Todos los países</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="filter-group">
+                                <label for="typeFilter" class="form-label">Tipo de Restricción</label>
+                                <select id="typeFilter" class="form-select">
+                                    <option value="">Todos los tipos</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="filter-group">
+                                <label for="eudrFilter" class="form-label">Pertinencia EUDR</label>
+                                <select id="eudrFilter" class="form-select">
+                                    <option value="">Todas</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="filter-group">
+                                <label for="searchInput" class="form-label">Búsqueda Rápida</label>
+                                <input type="text" id="searchInput" class="form-control" placeholder="Buscar por norma, descripción, etc.">
+                            </div>
+                        </div>
+                    </div>
+
+                     <div class="row">
+                        <div class="col-md-3">
+                            <div class="filter-group">
+                                <label for="cuantifyFilter" class="form-label">Cuantificable</label>
+                                <select id="cuantifyFilter" class="form-select">
+                                    <option value="">Todos</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="filter-group">
+                                <label for="datasetFilter" class="form-label">Tipo de Dataset</label>
+                                <select id="datasetFilter" class="form-select">
+                                    <option value="">Todos</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="filter-group">
+                                <label for="processFilter" class="form-label">Procesos</label>
+                                <select id="processFilter" class="form-select">
+                                    <option value="">Todos</option>
+                                </select>
+                            </div>
+                        </div>
+                         <div class="col-md-3">
+                            <div class="filter-group">
+                                <label for="scaleFilter" class="form-label">Escala</label>
+                                <select id="scaleFilter" class="form-select">
+                                    <option value="">Todos</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <button id="applyFilters" class="btn btn-primary"><i class="fas fa-search"></i> Aplicar Filtros</button>
+                            <button id="resetFilters" class="btn btn-outline-secondary"><i class="fas fa-undo"></i> Limpiar</button>
+                        </div>
+                    </div>
+                    <div id="activeFilters" class="active-filters">
+                        <strong>Filtros activos:</strong>
+                        <div id="filterBadges"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestañas para Mapa, Tabla y Chat -->
+        <div class="row">
+            <div class="col-12">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="map-tab" data-bs-toggle="tab" data-bs-target="#map-tab-pane" type="button" role="tab" aria-controls="map-tab-pane" aria-selected="true">
+                            <i class="fas fa-map"></i> Vista Geográfica
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="table-tab" data-bs-toggle="tab" data-bs-target="#table-tab-pane" type="button" role="tab" aria-controls="table-tab-pane" aria-selected="false">
+                            <i class="fas fa-table"></i> Vista Tabular
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="chat-tab" data-bs-toggle="tab" data-bs-target="#chat-tab-pane" type="button" role="tab" aria-controls="chat-tab-pane" aria-selected="false">
+                            <i class="fas fa-comments"></i> Vista Chat
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <!-- Pestaña del Mapa -->
+                    <div class="tab-pane fade show active" id="map-tab-pane" role="tabpanel" aria-labelledby="map-tab" tabindex="0">
+                        <div class="map-container slide-up">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3><i class="fas fa-layer-group"></i> Capas Geográficas</h3>
+                                    <div id="map">
+                                        <div class="loading-overlay" id="map-loading">
+                                            <div class="spinner"></div>
+                                            <p class="mt-3">Cargando mapa...</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Botón para abrir/cerrar panel de capas -->
+                                    <button id="toggleLayersPanel" class="toggle-layers-panel" title="Mostrar/Ocultar panel de capas">
+                                        <i class="fas fa-layer-group"></i>
+                                    </button>
+                                    
+                                    <!-- Panel de control de capas -->
+                                    <div class="control-panel" id="layersPanel">
+                                        <div class="control-panel-content">
+                                            <h4><i class="fas fa-layer-group me-2"></i> Capas GeoJSON</h4>
+                                            
+                                            <div class="mb-3">
+                                                <input type="text" id="searchLayers" class="form-control form-control-sm" placeholder="Buscar capas...">
+                                            </div>
+                                            
+                                            <div id="layers-list">
+                                                <div class="empty-state">
+                                                    <i class="fas fa-map-marked-alt"></i>
+                                                    <p>Cargando capas...</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <button id="reload-btn" class="reload-btn">
+                                                <i class="fas fa-sync-alt me-2"></i> Recargar Capas
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="map-info">
+                                        <h5><i class="fas fa-info-circle"></i> Información del Mapa</h5>
+                                        <p>Este mapa muestra las restricciones legales georreferenciadas para el cumplimiento del EUDR. 
+                                           Puede activar/desactivar las diferentes capas desde el panel de control. 
+                                           Haga clic en cualquier polígono para ver información detallada.</p>
+                                        <div id="featureInfo" class="feature-info" style="display: none;">
+                                            <h6><i class="fas fa-map-marker-alt"></i> Detalle de la Restricción Seleccionada</h6>
+                                            <div id="featureContent"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pestaña de la Tabla -->
+                    <div class="tab-pane fade" id="table-tab-pane" role="tabpanel" aria-labelledby="table-tab" tabindex="0">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 mb-4">
+                                <div class="card stats-card" id="totalRestrictionsCard">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Total Restricciones</h5>
+                                        <p class="stats-number" id="totalRestrictions">0</p>
+                                        <p class="card-text">En todos los países</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-4">
+                                <div class="card stats-card" id="highEudrCard">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Restricciones EUDR</h5>
+                                        <p class="stats-number" id="highEudr">0</p>
+                                        <p class="card-text">Pertinentes para cumplimiento</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-4">
+                                <div class="card stats-card" id="protectedAreasCard">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Restricciones Ambientales</h5>
+                                        <p class="stats-number" id="protectedAreas">0</p>
+                                        <p class="card-text">Normativas ambientales</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-4">
+                                <div class="card stats-card" id="waterBuffersCard">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Restricciones Hídricas</h5>
+                                        <p class="stats-number" id="waterBuffers">0</p>
+                                        <p class="card-text">Protección de recursos hídricos</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="table-container slide-up">
+                            <div class="action-buttons">
+                                <button id="exportExcel" class="btn btn-export"><i class="fas fa-file-excel"></i> Exportar a Excel</button>
+                                <button id="exportPDF" class="btn btn-outline-secondary"><i class="fas fa-file-pdf"></i> Exportar a PDF</button>
+                                <button id="exportExcelAll" class="btn btn-export"><i class="fas fa-file-excel"></i> Exportar TODO a Excel</button>
+                                
+                                <div class="ms-auto">
+                                    <span id="resultsCount" class="badge bg-secondary">0 resultados</span>
+                                </div>
+                            </div>
+                            
+                            <div id="noResults" class="no-results">
+                                <i class="fas fa-search fa-3x mb-3"></i>
+                                <h4>No se encontraron resultados</h4>
+                                <p>Intenta ajustar tus filtros o realizar una nueva búsqueda.</p>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table id="restrictionsTable" class="table table-striped table-hover" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>País</th>
+                                            <th>ID Restricción</th>
+                                            <th>Normativa</th>
+                                            <th>Descripción</th>
+                                            <th>Tipo</th>
+                                            <th>Pertinencia EUDR</th>
+                                            <th>Dataset</th>
+                                            <th>Geoproceso</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Los datos se cargarán aquí dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pestaña del Chat -->
+                    <div class="tab-pane fade" id="chat-tab-pane" role="tabpanel" aria-labelledby="chat-tab" tabindex="0">
+                        <div class="chat-container slide-up">
+                            <h3><i class="fas fa-comments"></i> Asistente de Consultas</h3>
+                            <p class="text-muted mb-4">Utilice este chat para realizar consultas sobre las restricciones legales y normativas del EUDR.</p>
+                            <iframe src="https://sud-austral.github.io/MAPA_RESTRICCIONES_CENTRO_AMERICA/chatBoton5.html" class="chat-iframe" title="Asistente de Consultas EUDR"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Detalle -->
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailModalLabel">Detalle de la Restricción</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body detail-content" id="modalContent">
+                    <!-- Contenido dinámico -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="text-center">
+        <div class="container">
+            <p>Visualizador de Restricciones Legales para el cumplimiento del EUDR - Proyecto "Paisajes Forestales y Comercio Sostenible"</p>
+            <p>© 2025 - Sistema de Información Geoespacial</p>
+        </div>
+    </footer>
+    
+    <!-- Indicador de carga -->
+    <div class="loading" id="loading-indicator">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+        <div class="loading-progress" id="loading-progress">Iniciando carga de capas...</div>
+        <div class="loading-layers" id="loading-layers"></div>
+        <div class="loading-error" id="loading-error"></div>
+    </div>
+    
+    <!-- Notificaciones -->
+    <div class="notification" id="notification">
+        <!-- Mensajes de notificación -->
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="data/restriccion.js"></script>
+
+    <script>
+        // =============================================
+        // CONSTANTES Y CONFIGURACIÓN GLOBAL
+        // =============================================
+
+        const CONFIG = {
+            MAP: {
+                CENTER: [-15.0, -60.0],
+                ZOOM: 4,
+                TILE_LAYER: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                ATTRIBUTION: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            },
+            COLORS: {
+                LAYERS: {
+                    'layer000': '#4CAF50',
+                    'layer001': '#F44336',
+                    'layer002': '#2196F3',
+                    'layer003': '#00BCD4',
+                    'layer004': '#FF9800',
+                    'layer005': '#9C27B0',
+                    'layer006': '#795548'
+                },
+                BADGES: {
+                    'ambiental': 'bg-primary',
+                    'forestal': 'bg-primary',
+                    'Conservación': 'bg-primary',
+                    'hidrica': 'bg-danger',
+                    'Hídrica': 'bg-danger',
+                    'fauna': 'bg-success',
+                    'default': 'bg-secondary'
+                }
+            },
+            COUNTRY_CENTERS: {
+                "Belice": { center: [17.0, -88.0], zoom: 8 },
+                "Chile": { center: [-35.0, -71.0], zoom: 5 },
+                "Perú": { center: [-13.0, -74.0], zoom: 6 },
+                "Colombia": { center: [4.0, -73.0], zoom: 6 },
+                "Brasil": { center: [-10.0, -55.0], zoom: 5 },
+                "México": { center: [19.0, -99.0], zoom: 5 },
+                "Argentina": { center: [-40.0, -72.0], zoom: 5 },
+                "Ecuador": { center: [-2.0, -44.0], zoom: 7 },
+                "Bolivia": { center: [-17.0, -65.0], zoom: 6 },
+                "Venezuela": { center: [8.0, -66.0], zoom: 6 },
+                "Paraguay": { center: [-23.0, -58.0], zoom: 7 },
+                "Uruguay": { center: [-33.0, -56.0], zoom: 8 },
+                "Guyana": { center: [5.0, -58.0], zoom: 7 },
+                "Surinam": { center: [4.0, -56.0], zoom: 7 },
+                "Guayana Francesa": { center: [4.0, -53.0], zoom: 8 }
+            }
+        };
+
+        // =============================================
+        // VARIABLES GLOBALES
+        // =============================================
+
+        let table;
+        let filteredData = [...restrictionsData];
+        let map;
+        let currentFeature = null;
+        let geojsonLayers = {};
+
+        // =============================================
+        // CLASE PRINCIPAL DE LA APLICACIÓN
+        // =============================================
+
+        class RestrictionsApp {
+            constructor() {
+                this.init();
+            }
+
+            init() {
+                this.initializeTable();
+                this.populateFilters();
+                this.setupEventListeners();
+                this.updateStats();
+                this.initializeMap();
+                
+                // Ocultar el indicador de carga del mapa después de un tiempo
+                setTimeout(() => {
+                    $('#map-loading').fadeOut();
+                }, 1500);
+            }
+
+            // =============================================
+            // INICIALIZACIÓN DEL MAPA
+            // =============================================
+
+            initializeMap() {
+                map = L.map('map').setView(CONFIG.MAP.CENTER, CONFIG.MAP.ZOOM);
+
+                // Capa base
+                const osmLayer = L.tileLayer(CONFIG.MAP.TILE_LAYER, {
+                    attribution: CONFIG.MAP.ATTRIBUTION
+                });
+                osmLayer.addTo(map);
+
+                // Agregar leyenda y cargar capas
+                this.addLegend();
+                this.loadGeoJsonLayers();
+
+                // Evento para cuando se hace clic en el mapa
+                map.on('click', () => {
+                    this.hideFeatureInfo();
+                });
+            }
+
+            addLegend() {
+                const legend = L.control({ position: 'bottomright' });
+                legend.onAdd = function (map) {
+                    const div = L.DomUtil.create('div', 'legend');
+                    div.innerHTML = '<h4>Leyenda</h4>' +
+                        '<i style="background:#3498db"></i> Ambiental/Forestal<br>' +
+                        '<i style="background:#e74c3c"></i> Hídrica<br>' +
+                        '<i style="background:#27ae60"></i> Fauna<br>' +
+                        '<i style="background:#8e44ad"></i> Urbana<br>' +
+                        '<i style="background:#1abc9c"></i> Cultural<br>' +
+                        '<i style="background:#95a5a6"></i> Otros<br>';
+                    return div;
+                };
+                legend.addTo(map);
+            }
+
+            // =============================================
+            // GESTIÓN DE CAPAS GEOJSON
+            // =============================================
+
+            loadGeoJsonLayers() {
+                document.getElementById('loading-indicator').style.display = 'block';
+
+                let totalLayers = restrictionsData.length;
+                let loadedLayers = 0;
+                let errorLayers = 0;
+
+                this.updateLoadingIndicator(loadedLayers, totalLayers, errorLayers);
+
+                restrictionsData.forEach(restriction => {
+                    if (restriction.id_layer && restriction.url_geojson) {
+                        this.addGeoJSONLayer(
+                            restriction.id_layer,
+                            restriction.entregable || restriction.nombre_del_dataset,
+                            restriction.url_geojson
+                        ).then(() => {
+                            loadedLayers++;
+                            this.updateLoadingIndicator(loadedLayers, totalLayers, errorLayers);
+                            this.checkLoadingComplete(loadedLayers, totalLayers, errorLayers);
+                        }).catch(() => {
+                            errorLayers++;
+                            this.updateLoadingIndicator(loadedLayers, totalLayers, errorLayers);
+                            this.checkLoadingComplete(loadedLayers, totalLayers, errorLayers);
+                        });
+                    } else {
+                        totalLayers--;
+                        this.updateLoadingIndicator(loadedLayers, totalLayers, errorLayers);
+                    }
+                });
+            }
+
+            async addGeoJSONLayer(id, name, url) {
+                const color = CONFIG.COLORS.LAYERS[id] || this.getRandomColor();
+                
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error(`Error al cargar el GeoJSON: ${response.statusText}`);
+                    
+                    const data = await response.json();
+                    const layer = L.geoJSON(data, {
+                        style: {
+                            color: color,
+                            weight: 2,
+                            fillOpacity: 0.3
+                        },
+                        onEachFeature: (feature, layer) => {
+                            this.setupLayerInteraction(feature, layer, id);
+                        }
+                    });
+
+                    geojsonLayers[id] = {
+                        layer: layer,
+                        url: url,
+                        color: color,
+                        visible: false,
+                        name: name
+                    };
+
+                    this.updateLayersList();
+                } catch (error) {
+                    console.error('Error cargando capa:', error);
+                    throw error;
+                }
+            }
+
+            setupLayerInteraction(feature, layer, id) {
+                // Añadir popup con propiedades
+                if (feature.properties) {
+                    let popupContent = '<div class="popup-content">';
+                    for (const key in feature.properties) {
+                        popupContent += `<div><strong>${key}:</strong> ${feature.properties[key]}</div>`;
+                    }
+                    popupContent += '</div>';
+                    layer.bindPopup(popupContent);
+                }
+
+                // Evento de clic en la capa
+                layer.on('click', (e) => {
+                    const restriction = restrictionsData.find(r => r.id_layer === id);
+                    if (restriction) {
+                        this.showFeatureInfo(restriction);
+                    }
+
+                    // Resaltar la capa
+                    if (currentFeature) {
+                        this.resetFeatureStyle(currentFeature);
+                    }
+                    currentFeature = layer;
+                    this.highlightFeature(layer);
+                });
+            }
+
+            updateLoadingIndicator(loaded, total, errors) {
+                const loadingProgress = document.getElementById('loading-progress');
+                const loadingLayers = document.getElementById('loading-layers');
+                const loadingError = document.getElementById('loading-error');
+
+                if (loaded === 0) {
+                    loadingProgress.textContent = 'Iniciando carga de capas...';
+                } else if (loaded < total) {
+                    loadingProgress.textContent = `Cargando capas... (${loaded}/${total})`;
+                    loadingLayers.textContent = `${total - loaded} capas restantes por cargar`;
+                } else {
+                    loadingProgress.textContent = `Carga completada (${loaded}/${total})`;
+                    loadingLayers.textContent = '';
+                }
+
+                if (errors > 0) {
+                    loadingError.textContent = `${errors} error(es) de carga`;
+                } else {
+                    loadingError.textContent = '';
+                }
+            }
+
+            checkLoadingComplete(loaded, total, errors) {
+                if (loaded + errors === total) {
+                    setTimeout(() => {
+                        document.getElementById('loading-indicator').style.display = 'none';
+                        if (errors === 0) {
+                            this.showNotification('Todas las capas se han cargado correctamente');
+                        } else {
+                            this.showNotification(`Se cargaron ${loaded} de ${total} capas. ${errors} capa(s) no se pudieron cargar.`, true);
+                        }
+                    }, 1000);
+                }
+            }
+
+            // =============================================
+            // GESTIÓN DE INTERFAZ DE CAPAS
+            // =============================================
+
+            updateLayersList() {
+                const layersList = document.getElementById('layers-list');
+                layersList.innerHTML = '';
+
+                if (Object.keys(geojsonLayers).length === 0) {
+                    layersList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <p>No hay capas disponibles</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                for (const id in geojsonLayers) {
+                    const layerInfo = geojsonLayers[id];
+                    const layerItem = document.createElement('div');
+                    layerItem.className = 'layer-item';
+                    layerItem.innerHTML = `
+                        <div>
+                            <span class="layer-color" style="background-color: ${layerInfo.color}"></span>
+                            <span class="layer-name">${layerInfo.name}</span>
+                        </div>
+                        <div class="layer-actions">
+                            <button class="btn btn-sm ${layerInfo.visible ? 'btn-success' : 'btn-outline-secondary'} btn-layer toggle-layer" data-id="${id}" title="${layerInfo.visible ? 'Ocultar capa' : 'Mostrar capa'}">
+                                <i class="fas ${layerInfo.visible ? 'fa-eye' : 'fa-eye-slash'}"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger btn-layer remove-layer" data-id="${id}" title="Eliminar capa">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    layersList.appendChild(layerItem);
+                }
+
+                this.setupLayerEventListeners();
+                this.setupLayerSearch();
+            }
+
+            setupLayerEventListeners() {
+                document.querySelectorAll('.toggle-layer').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const id = e.currentTarget.getAttribute('data-id');
+                        this.toggleLayer(id);
+                    });
+                });
+
+                document.querySelectorAll('.remove-layer').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const id = e.currentTarget.getAttribute('data-id');
+                        this.removeLayer(id);
+                    });
+                });
+            }
+
+            setupLayerSearch() {
+                document.getElementById('searchLayers').addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const layerItems = document.querySelectorAll('.layer-item');
+
+                    layerItems.forEach(item => {
+                        const layerName = item.querySelector('.layer-name').textContent.toLowerCase();
+                        item.style.display = layerName.includes(searchTerm) ? 'flex' : 'none';
+                    });
+                });
+            }
+
+            toggleLayer(id) {
+                if (geojsonLayers[id]) {
+                    const layerInfo = geojsonLayers[id];
+
+                    if (layerInfo.visible) {
+                        map.removeLayer(layerInfo.layer);
+                        layerInfo.visible = false;
+                    } else {
+                        map.addLayer(layerInfo.layer);
+                        layerInfo.visible = true;
+
+                        try {
+                            map.fitBounds(layerInfo.layer.getBounds(), { padding: [20, 20] });
+                        } catch (e) {
+                            console.error("Error al ajustar los límites de la capa:", e);
+                        }
+                    }
+
+                    this.updateLayersList();
+                }
+            }
+
+            removeLayer(id) {
+                if (geojsonLayers[id]) {
+                    const layerInfo = geojsonLayers[id];
+
+                    if (layerInfo.visible) {
+                        map.removeLayer(layerInfo.layer);
+                    }
+
+                    delete geojsonLayers[id];
+                    this.updateLayersList();
+                    this.showNotification(`Capa "${layerInfo.name}" eliminada`);
+                }
+            }
+
+            // =============================================
+            // GESTIÓN DE FILTROS
+            // =============================================
+
+            populateFilters() {
+                this.updateFilterOptions('countryFilter', restrictionsData, 'pais');
+                this.updateFilterOptions('typeFilter', restrictionsData, 'tipo_descrip');
+                this.updateFilterOptions('eudrFilter', restrictionsData, 'eudr_cat');
+                this.updateFilterOptions('cuantifyFilter', restrictionsData, 'cuantificable');
+                this.updateFilterOptions('datasetFilter', restrictionsData, 'tipo_dataset');
+                this.updateFilterOptions('processFilter', restrictionsData, 'tipo_geoproceso');
+                this.updateFilterOptions('scaleFilter', restrictionsData, 'nivel_escala');
+            }
+
+            updateFilterOptions(filterId, data, property) {
+                const select = document.getElementById(filterId);
+                const currentValue = select.value;
+
+                let values = [...new Set(data.map(item => item[property]))]
+                    .filter(value => value !== undefined && value !== null && value !== '')
+                    .sort();
+
+                select.innerHTML = '<option value="">Todos</option>';
+                values.forEach(value => {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    select.appendChild(option);
+                });
+
+                select.value = currentValue && values.includes(currentValue) ? currentValue : '';
+            }
+
+            updateAllFilters() {
+                this.updateFilterOptions('countryFilter', filteredData, 'pais');
+                this.updateFilterOptions('typeFilter', filteredData, 'tipo_descrip');
+                this.updateFilterOptions('eudrFilter', filteredData, 'eudr_cat');
+                this.updateFilterOptions('cuantifyFilter', filteredData, 'cuantificable');
+                this.updateFilterOptions('datasetFilter', filteredData, 'tipo_dataset');
+                this.updateFilterOptions('processFilter', filteredData, 'tipo_geoproceso');
+                this.updateFilterOptions('scaleFilter', filteredData, 'nivel_escala');
+            }
+
+            applyFilters() {
+                const filters = this.getCurrentFilters();
+                
+                filteredData = restrictionsData.filter(item => {
+                    return Object.keys(filters).every(key => {
+                        if (!filters[key].value) return true;
+                        
+                        switch(key) {
+                            case 'search':
+                                return this.matchesSearch(item, filters[key].value);
+                            default:
+                                return item[filters[key].property] === filters[key].value;
+                        }
+                    });
+                });
+
+                this.updateTable();
+                this.updateStats();
+                this.updateResultsCount();
+                this.updateActiveFilters();
+                this.toggleNoResults();
+                this.updateAllFilters();
+            }
+
+            getCurrentFilters() {
+                return {
+                    country: { value: $('#countryFilter').val(), property: 'pais' },
+                    type: { value: $('#typeFilter').val(), property: 'tipo_descrip' },
+                    eudr: { value: $('#eudrFilter').val(), property: 'eudr_cat' },
+                    cuantify: { value: $('#cuantifyFilter').val(), property: 'cuantificable' },
+                    dataset: { value: $('#datasetFilter').val(), property: 'tipo_dataset' },
+                    process: { value: $('#processFilter').val(), property: 'tipo_geoproceso' },
+                    scale: { value: $('#scaleFilter').val(), property: 'nivel_escala' },
+                    search: { value: $('#searchInput').val().toLowerCase() }
+                };
+            }
+
+            matchesSearch(item, searchTerm) {
+                if (!searchTerm) return true;
+                
+                const searchFields = [
+                    'pais', 'normativa_aplicable', 'descripcion_restriccion', 
+                    'ip_restriccion', 'tipo_restriccion', 'nombre_del_dataset'
+                ];
+                
+                return searchFields.some(field => 
+                    item[field] && item[field].toLowerCase().includes(searchTerm)
+                );
+            }
+
+            resetFilters() {
+                $('#countryFilter, #typeFilter, #eudrFilter, #cuantifyFilter, #datasetFilter, #processFilter, #scaleFilter, #searchInput').val('');
+                
+                filteredData = [...restrictionsData];
+                this.updateTable();
+                this.updateStats();
+                this.updateResultsCount();
+                this.updateActiveFilters();
+                this.toggleNoResults();
+                this.updateAllFilters();
+            }
+
+            // =============================================
+            // GESTIÓN DE LA TABLA
+            // =============================================
+
+            initializeTable() {
+                table = $('#restrictionsTable').DataTable({
+                    data: restrictionsData,
+                    columns: this.getTableColumns(),
+                    language: {
+                        url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                    },
+                    pageLength: 10,
+                    lengthMenu: [5, 10, 25, 50],
+                    responsive: true,
+                    order: [[0, 'asc']],
+                    initComplete: () => {
+                        this.updateResultsCount();
+                    }
+                });
+
+                this.setupTableEventListeners();
+            }
+
+            getTableColumns() {
+                return [
+                    {
+                        data: "pais",
+                        title: "País",
+                        render: (data) => `<span class="fw-bold">${data}</span>`
+                    },
+                    {
+                        data: "ip_restriccion",
+                        title: "ID Restricción",
+                        render: (data) => `<code class="bg-light">${data}</code>`
+                    },
+                    {
+                        data: "normativa_aplicable",
+                        title: "Norma Aplicable",
+                        render: (data, type, row) => {
+                            if (row.enlace_norma && row.enlace_norma !== "") {
+                                return `<a href="${row.enlace_norma}" target="_blank" class="text-decoration-none text-primary">${data}</a>`;
+                            }
+                            return data;
+                        }
+                    },
+                    {
+                        data: "descripcion_restriccion",
+                        title: "Restricción",
+                        render: (data) => data.length > 100 ? data.substring(0, 100) + '...' : data
+                    },
+                    {
+                        data: "tipo_restriccion",
+                        title: "Tipo",
+                        render: (data) => data
+                    },
+                    {
+                        data: "eudr_cat",
+                        title: "Categoría EUDR",
+                        render: (data) => data
+                    },
+                    {
+                        data: "nombre_del_dataset",
+                        title: "Dataset",
+                        render: (data, type, row) => {
+                            if (!data || data === "") return "<span class='text-muted'>No especificado</span>";
+                            if (row.enlace_dataset && row.enlace_dataset !== "") {
+                                return `<a href="${row.enlace_dataset}" target="_blank" class="text-decoration-none text-info">${data}</a>`;
+                            }
+                            return data;
+                        }
+                    },
+                    {
+                        data: "tipo_analisis",
+                        title: "Tipo Analisis",
+                        render: (data) => {
+                            if (!data || data === "") return "<span class='text-muted'>No especificado</span>";
+                            return data.length > 50 ? data.substring(0, 50) + '...' : data;
+                        }
+                    },
+                    {
+                        data: null,
+                        title: "Acciones",
+                        orderable: false,
+                        render: (data, type, row) => this.getActionButtons(row)
+                    }
+                ];
+            }
+
+            getActionButtons(row) {
+                return `
+                    <button class="btn btn-sm btn-outline-primary view-detail" data-id="${row.ip_restriccion}" title="Ver detalle">
+                        <i class="fas fa-info-circle"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-success export-row" data-id="${row.ip_restriccion}" title="Exportar">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-info view-on-map" data-country="${row.pais}" data-type="${row.tipo_restriccion}" data-id_layer="${row.id_layer}" title="Ver en mapa">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </button>
+                `;
+            }
+
+            setupTableEventListeners() {
+                $('#restrictionsTable tbody')
+                    .on('click', '.view-detail', (e) => {
+                        const id = $(e.currentTarget).data('id');
+                        this.showDetailModal(id);
+                    })
+                    .on('click', '.export-row', (e) => {
+                        const id = $(e.currentTarget).data('id');
+                        this.exportRow(id);
+                    })
+                    .on('click', '.view-on-map', (e) => {
+                        const $target = $(e.currentTarget);
+                        const country = $target.data('country');
+                        const type = $target.data('type');
+                        const id_layer = $target.data('id_layer');
+                        $('#map-tab').tab('show');
+                        this.viewOnMap(country, type, id_layer);
+                    });
+            }
+
+            updateTable() {
+                table.clear();
+                table.rows.add(filteredData);
+                table.draw();
+            }
+
+            // =============================================
+            // GESTIÓN DE EVENTOS
+            // =============================================
+
+            setupEventListeners() {
+                // Filtros
+                $('#applyFilters').click(() => this.applyFilters());
+                $('#resetFilters').click(() => this.resetFilters());
+                $('#searchInput').on('keyup', () => this.applyFilters());
+                $('#countryFilter, #typeFilter, #eudrFilter, #cuantifyFilter, #datasetFilter, #processFilter, #scaleFilter')
+                    .on('change', () => this.applyFilters());
+
+                // Recargar capas
+                document.getElementById('reload-btn').addEventListener('click', () => this.reloadLayers());
+
+                // Tarjetas de estadísticas clickeables
+                $('#totalRestrictionsCard').click(() => {
+                    this.resetFilters();
+                    $('#table-tab').tab('show');
+                });
+
+                $('#highEudrCard').click(() => {
+                    this.resetFilters();
+                    $('#eudrFilter').val('true');
+                    $('#table-tab').tab('show');
+                    this.applyFilters();
+                });
+
+                $('#protectedAreasCard').click(() => {
+                    this.resetFilters();
+                    $('#typeFilter').val('ambiental');
+                    $('#table-tab').tab('show');
+                    this.applyFilters();
+                });
+
+                $('#waterBuffersCard').click(() => {
+                    this.resetFilters();
+                    $('#typeFilter').val('hidrica');
+                    $('#table-tab').tab('show');
+                    this.applyFilters();
+                });
+
+                // Panel de capas
+                this.setupLayersPanel();
+            }
+
+            setupLayersPanel() {
+                const toggleLayersPanel = document.getElementById('toggleLayersPanel');
+                const layersPanel = document.getElementById('layersPanel');
+                const toggleIcon = toggleLayersPanel.querySelector('i');
+
+                toggleLayersPanel.addEventListener('click', () => {
+                    layersPanel.classList.toggle('show');
+                    
+                    if (layersPanel.classList.contains('show')) {
+                        toggleIcon.classList.replace('fa-layer-group', 'fa-times');
+                    } else {
+                        toggleIcon.classList.replace('fa-times', 'fa-layer-group');
+                    }
+                });
+            }
+
+            reloadLayers() {
+                // Limpiar capas existentes
+                for (const id in geojsonLayers) {
+                    const layerInfo = geojsonLayers[id];
+                    if (layerInfo.visible) {
+                        map.removeLayer(layerInfo.layer);
+                    }
+                }
+
+                // Reiniciar objeto de capas
+                geojsonLayers = {};
+                this.updateLayersList();
+
+                // Volver a cargar las capas
+                this.loadGeoJsonLayers();
+            }
+
+            // =============================================
+            // ESTADÍSTICAS Y UI
+            // =============================================
+
+            updateStats() {
+                const total = filteredData.length;
+                const eudr = filteredData.filter(item => item.eudr_cat).length;
+                const environmental = filteredData.filter(item =>
+                    item.tipo_restriccion.includes('ambiental') ||
+                    item.tipo_restriccion.includes('forestal') ||
+                    item.tipo_restriccion.includes('Conservación')
+                ).length;
+                const water = filteredData.filter(item =>
+                    item.tipo_restriccion.includes('hidrica') ||
+                    item.tipo_restriccion.includes('Hídrica')
+                ).length;
+
+                $('#totalRestrictions').text(total);
+                $('#highEudr').text(eudr);
+                $('#protectedAreas').text(environmental);
+                $('#waterBuffers').text(water);
+            }
+
+            updateResultsCount() {
+                $('#resultsCount').text(`${filteredData.length} resultados`);
+            }
+
+            updateActiveFilters() {
+                const filters = this.getCurrentFilters();
+                let badgesHtml = '';
+                let hasActiveFilters = false;
+
+                const badgeConfig = {
+                    country: { icon: 'fa-globe-americas', text: (val) => val },
+                    type: { icon: 'fa-layer-group', text: (val) => val },
+                    eudr: { icon: 'fa-leaf', text: (val) => `EUDR ${val === "true" ? "Sí" : "No"}` },
+                    cuantify: { icon: 'fa-check-circle', text: (val) => `Cuantificable ${val}` },
+                    dataset: { icon: 'fa-database', text: (val) => val },
+                    process: { icon: 'fa-cogs', text: (val) => val },
+                    scale: { icon: 'fa-ruler', text: (val) => val },
+                    search: { icon: 'fa-search', text: (val) => `"${val}"` }
+                };
+
+                Object.keys(filters).forEach(key => {
+                    if (filters[key].value) {
+                        const config = badgeConfig[key];
+                        badgesHtml += `<span class="filter-badge" data-filter="${key}">
+                            <i class="fas ${config.icon}"></i> ${config.text(filters[key].value)}
+                        </span>`;
+                        hasActiveFilters = true;
+                    }
+                });
+
+                $('#filterBadges').html(badgesHtml);
+                $('#activeFilters').toggle(hasActiveFilters);
+
+                $('.filter-badge').on('click', (e) => {
+                    const filterType = $(e.currentTarget).data('filter');
+                    $(`#${filterType}Filter`).val('');
+                    this.applyFilters();
+                });
+            }
+
+            toggleNoResults() {
+                const hasResults = filteredData.length > 0;
+                $('#noResults').toggle(!hasResults);
+                $('.table-responsive').toggle(hasResults);
+            }
+
+            // =============================================
+            // FUNCIONALIDADES DEL MAPA
+            // =============================================
+
+            showFeatureInfo(restriction) {
+                const content = `
+                    <strong>${restriction.descripcion_restriccion}</strong><br>
+                    <strong>País:</strong> ${restriction.pais}<br>
+                    <strong>Tipo:</strong> ${restriction.tipo_restriccion}<br>
+                    <strong>ID:</strong> ${restriction.ip_restriccion}<br>
+                    <button class="btn btn-sm btn-primary mt-2" onclick="app.viewOnMap('${restriction.pais}', '${restriction.tipo_restriccion}', '${restriction.id_layer}')">Ver en Mapa</button>
+                    <button class="btn btn-sm btn-outline-primary mt-2 ms-1" onclick="app.showDetailForId('${restriction.ip_restriccion}')">Ver Detalle</button>
+                `;
+                $('#featureContent').html(content);
+                $('#featureInfo').show();
+            }
+
+            hideFeatureInfo() {
+                $('#featureInfo').hide();
+                if (currentFeature) {
+                    this.resetFeatureStyle(currentFeature);
+                    currentFeature = null;
+                }
+            }
+
+            showDetailForId(id) {
+                const item = restrictionsData.find(row => row.ip_restriccion === id);
+                if (item) {
+                    this.showDetailModal(item.ip_restriccion);
+                }
+            }
+
+            resetFeatureStyle(feature) {
+                feature.setStyle({
+                    color: feature.options.color,
+                    weight: 2,
+                    fillOpacity: 0.3
+                });
+            }
+
+            highlightFeature(feature) {
+                feature.setStyle({
+                    weight: 5,
+                    color: '#e74c3c',
+                    fillOpacity: 0.9
+                });
+            }
+
+            viewOnMap(country, type, id_layer) {
+                // Cerrar modal si está abierto
+                const detailModal = document.getElementById('detailModal');
+                const modalInstance = bootstrap.Modal.getInstance(detailModal);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+
+                $('#map-tab').tab('show');
+
+                // Activar la capa correspondiente si existe
+                if (id_layer && geojsonLayers[id_layer]) {
+                    const layerInfo = geojsonLayers[id_layer];
+                    if (!layerInfo.visible) {
+                        this.toggleLayer(id_layer);
+                    }
+
+                    try {
+                        map.fitBounds(layerInfo.layer.getBounds(), { padding: [20, 20] });
+                    } catch (e) {
+                        console.error("Error al ajustar los límites de la capa:", e);
+                        this.centerMapOnCountry(country);
+                    }
+                } else {
+                    this.centerMapOnCountry(country);
+                }
+            }
+
+            centerMapOnCountry(country) {
+                const countryConfig = CONFIG.COUNTRY_CENTERS[country] || { center: CONFIG.MAP.CENTER, zoom: CONFIG.MAP.ZOOM };
+                map.setView(countryConfig.center, countryConfig.zoom);
+            }
+
+            // =============================================
+            // MODALES Y DETALLES
+            // =============================================
+
+            showDetailModal(id) {
+                const item = restrictionsData.find(row => row.ip_restriccion === id);
+                if (item) {
+                    const modalContent = this.generateModalContent(item);
+                    $('#modalContent').html(modalContent);
+                    $('#detailModalLabel').text(`Detalle de la Restricción: ${item.ip_restriccion}`);
+                    new bootstrap.Modal(document.getElementById('detailModal')).show();
+                }
+            }
+
+            generateModalContent(item) {
+                return `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-balance-scale"></i> Información Legal</h5>
+                            <hr>
+                            ${this.generateLegalInfo(item)}
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-tools"></i> Detalles Técnicos</h5>
+                            <hr>
+                            ${this.generateTechnicalDetails(item)}
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5><i class="fas fa-align-left"></i> Descripción de la Restricción</h5>
+                            <hr>
+                            <div class="alert alert-info">${item.descripcion_restriccion}</div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5><i class="fas fa-leaf"></i> Pertinencia EUDR</h5>
+                            <hr>
+                            <div class="alert alert-${item.eudr_cat ? 'success' : 'secondary'}">
+                                ${item.eudr_cat ? `Categoría: ${item.eudr_cat}. ${item.pertinencia_eudr}` : 'Esta restricción no es pertinente para el cumplimiento del EUDR'}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5><i class="fas fa-database"></i> Dataset y Geoproceso</h5>
+                            <hr>
+                            ${this.generateDatasetInfo(item)}
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5><i class="fas fa-cogs"></i> Geoproceso a Realizar</h5>
+                            <hr>
+                            <div class="bg-light p-3 rounded">
+                                ${item.geoproceso_a_realizar || "<span class='text-muted'>No especificado</span>"}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5><i class="fas fa-info"></i> Información Adicional</h5>
+                            <hr>
+                            ${this.generateAdditionalInfo(item)}
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <button class="btn btn-primary" onclick="app.viewOnMap('${item.pais}', '${item.tipo_restriccion}', '${item.id_layer}')">
+                                <i class="fas fa-map-marked-alt"></i> Ver esta restricción en el mapa
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            generateLegalInfo(item) {
+                return `
+                    <p><strong><i class="fas fa-flag"></i> País:</strong> ${item.pais} (${item.iso})</p>
+                    <p><strong><i class="fas fa-id-card"></i> ID Restricción:</strong> <code>${item.ip_restriccion}</code></p>
+                    <p><strong><i class="fas fa-book"></i> Normativa:</strong> <a href="${item.enlace_norma}" target="_blank" class="text-decoration-none">${item.normativa_aplicable}</a> (${item.normativa_tipo})</p>
+                    <p><strong><i class="fas fa-file-alt"></i> Artículo:</strong> ${item.articulo_norma}</p>
+                    <p><strong><i class="fas fa-calendar-alt"></i> Fecha Norma:</strong> ${item.fecha_norma} (${item.decada_norma})</p>
+                    <p><strong><i class="fas fa-building"></i> Institución Responsable:</strong> ${item.institucion_responsable}</p>
+                    <p><strong><i class="fas fa-map-marker-alt"></i> Nivel/Escala:</strong> ${item.nivel_escala}</p>
+                    ${item.texto_norma ? `<p><strong><i class="fas fa-file-contract"></i> Texto Norma:</strong> ${item.texto_norma}</p>` : ''}
+                    ${item.observaciones_relevantes ? `<p><strong><i class="fas fa-sticky-note"></i> Observaciones Relevantes:</strong> ${item.observaciones_relevantes}</p>` : ''}
+                `;
+            }
+
+            generateTechnicalDetails(item) {
+                return `
+                    <p><strong><i class="fas fa-layer-group"></i> Tipo de Restricción:</strong> <span class="badge ${this.getBadgeClass(item.tipo_restriccion)}">${item.tipo_restriccion}</span></p>
+                    <p><strong><i class="fas fa-tag"></i> Tipo Descripción:</strong> ${item.tipo_descrip}</p>
+                    <p><strong><i class="fas fa-check-circle"></i> Cuantificable:</strong> ${item.cuantificable === 'Si' ? 'Sí' : 'No'}</p>
+                    <p><strong><i class="fas fa-ruler"></i> Parámetros Geográficos:</strong> ${item.parametros_geo}</p>
+                    <p><strong><i class="fas fa-draw-polygon"></i> Representación:</strong> ${item.representacion}</p>
+                    <p><strong><i class="fas fa-chart-line"></i> Tipo de Análisis:</strong> ${item.tipo_analisis || "No especificado"}</p>
+                    <p><strong><i class="fas fa-database"></i> ID Dato:</strong> ${item.id_dato || "No especificado"}</p>
+                    <p><strong><i class="fas fa-map"></i> Cartografía Base:</strong> ${item.cartografia_base || "No especificado"}</p>
+                `;
+            }
+
+            generateDatasetInfo(item) {
+                return `
+                    <p><strong><i class="fas fa-database"></i> Dataset:</strong> 
+                        ${item.nombre_del_dataset && item.enlace_dataset ? 
+                            `<a href="${item.enlace_dataset}" target="_blank" class="text-decoration-none">${item.nombre_del_dataset}</a>` : 
+                            (item.nombre_del_dataset || "<span class='text-muted'>No especificado</span>")
+                        }
+                    </p>
+                    <p><strong><i class="fas fa-calendar"></i> Fecha Dataset:</strong> ${item.fecha_dataset ? new Date(item.fecha_dataset).toLocaleDateString() : "No especificado"} (${item.decada_dataset})</p>
+                    <p><strong><i class="fas fa-cogs"></i> Tipo de Dataset:</strong> ${item.tipo_dataset || "<span class='text-muted'>No especificado</span>"}</p>
+                    <p><strong><i class="fas fa-project-diagram"></i> Tipo de Geoproceso:</strong> ${item.tipo_geoproceso || "<span class='text-muted'>No especificado</span>"}</p>
+                    <p><strong><i class="fas fa-code-branch"></i> ID Capa:</strong> ${item.id_layer || "<span class='text-muted'>No especificado</span>"}</p>
+                    <p><strong><i class="fas fa-file-alt"></i> Descripción Dataset:</strong> ${item.descripcion_dataset || "<span class='text-muted'>No especificado</span>"}</p>
+                    <p><strong><i class="fas fa-globe"></i> Cobertura Espacial:</strong> ${item.cobertura_espacial || "<span class='text-muted'>No especificado</span>"}</p>
+                    <p><strong><i class="fas fa-building"></i> Proveedor Dataset:</strong> ${item.proveedor_dataset || "<span class='text-muted'>No especificado</span>"}</p>
+                    <p><strong><i class="fas fa-link"></i> Fuente:</strong> ${item.fuente || "<span class='text-muted'>No especificado</span>"}</p>
+                    <p><strong><i class="fas fa-shield-alt"></i> Licencia:</strong> ${item.licencia_condiciones_de_uso || "<span class='text-muted'>No especificado</span>"}</p>
+                    <p><strong><i class="fas fa-envelope"></i> Contacto Oficial:</strong> ${item.contacto_oficial || "<span class='text-muted'>No especificado</span>"}</p>
+                    ${item.observaciones_dataset ? `<p><strong><i class="fas fa-sticky-note"></i> Observaciones Dataset:</strong> ${item.observaciones_dataset}</p>` : ''}
+                    ${item.entregable ? `<p><strong><i class="fas fa-file"></i> Entregable:</strong> ${item.entregable}</p>` : ''}
+                    ${item.link_entregable ? `<p><strong><i class="fas fa-link"></i> Link Entregable:</strong> <a href="${item.link_entregable}" target="_blank">${item.link_entregable}</a></p>` : ''}
+                `;
+            }
+
+            generateAdditionalInfo(item) {
+                let info = '';
+                
+                if (item.analisis_geoespacial && item.analisis_geoespacial !== "") {
+                    info += `<p><strong><i class="fas fa-globe-americas"></i> Análisis Geoespacial:</strong> ${item.analisis_geoespacial}</p>`;
+                }
+                
+                if (item.observaciones && item.observaciones !== "") {
+                    info += `<p><strong><i class="fas fa-sticky-note"></i> Observaciones:</strong> ${item.observaciones}</p>`;
+                }
+                
+                if (item.fuente_informacion && item.fuente_informacion !== "") {
+                    info += `<p><strong><i class="fas fa-font"></i> Fuente Información:</strong> ${item.fuente_informacion}</p>`;
+                }
+                
+                if (item.fecha_actualizacion && item.fecha_actualizacion !== "") {
+                    info += `<p><strong><i class="fas fa-calendar-check"></i> Fecha Actualización:</strong> ${item.fecha_actualizacion}</p>`;
+                }
+                
+                if (item.estado && item.estado !== "") {
+                    info += `<p><strong><i class="fas fa-check-circle"></i> Estado:</strong> ${item.estado}</p>`;
+                }
+                
+                return info || '<p class="text-muted">No hay información adicional disponible.</p>';
+            }
+
+            // =============================================
+            // MÉTODOS FALTANTES
+            // =============================================
+
+            getBadgeClass(type) {
+                if (!type) return 'badge-otros';
+                
+                const typeLower = type.toLowerCase();
+                
+                if (typeLower.includes('ambiental') || typeLower.includes('forestal') || typeLower.includes('conservación')) {
+                    return 'badge-eudr';
+                } else if (typeLower.includes('hidrica') || typeLower.includes('hídrica')) {
+                    return 'badge-buffer';
+                } else if (typeLower.includes('fauna')) {
+                    return 'badge-ap';
+                } else {
+                    return 'badge-otros';
+                }
+            }
+
+            exportRow(id) {
+                const item = restrictionsData.find(row => row.ip_restriccion === id);
+                if (!item) {
+                    this.showNotification('No se pudo encontrar el registro para exportar', true);
+                    return;
+                }
+
+                try {
+                    // Crear workbook y worksheet
+                    const wb = XLSX.utils.book_new();
+                    const ws = XLSX.utils.json_to_sheet([item]);
+                    
+                    // Añadir worksheet al workbook
+                    XLSX.utils.book_append_sheet(wb, ws, 'Restricción');
+                    
+                    // Exportar el archivo
+                    XLSX.writeFile(wb, `restriccion_${id}.xlsx`);
+                    
+                    this.showNotification(`Restricción ${id} exportada correctamente`);
+                } catch (error) {
+                    console.error('Error al exportar:', error);
+                    this.showNotification('Error al exportar el registro', true);
+                }
+            }
+
+            getRandomColor() {
+                const letters = '0123456789ABCDEF';
+                let color = '#';
+                for (let i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+
+            showNotification(message, isError = false) {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = `notification ${isError ? 'error' : ''}`;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 5000);
+            }
+
+            // =============================================
+            // FUNCIONES FALTANTES
+            // =============================================
+
+            // Función para mostrar detalles de una restricción por su ID
+            showDetailForId(id) {
+                const item = restrictionsData.find(row => row.ip_restriccion === id);
+                if (item) {
+                    this.showDetailModal(item.ip_restriccion);
+                }
+            }
+
+            // Función para centrar el mapa en un país específico
+            centerMapOnCountry(country) {
+                const countryConfig = CONFIG.COUNTRY_CENTERS[country] || { center: CONFIG.MAP.CENTER, zoom: CONFIG.MAP.ZOOM };
+                map.setView(countryConfig.center, countryConfig.zoom);
+            }
+
+            // Función para obtener la clase CSS para un badge según el tipo
+            getBadgeClass(type) {
+                if (!type) return 'badge-otros';
+                
+                const typeLower = type.toLowerCase();
+                
+                if (typeLower.includes('ambiental') || typeLower.includes('forestal') || typeLower.includes('conservación')) {
+                    return 'badge-eudr';
+                } else if (typeLower.includes('hidrica') || typeLower.includes('hídrica')) {
+                    return 'badge-buffer';
+                } else if (typeLower.includes('fauna')) {
+                    return 'badge-ap';
+                } else {
+                    return 'badge-otros';
+                }
+            }
+
+            // Función para exportar una fila específica
+            exportRow(id) {
+                const item = restrictionsData.find(row => row.ip_restriccion === id);
+                if (!item) {
+                    this.showNotification('No se pudo encontrar el registro para exportar', true);
+                    return;
+                }
+
+                try {
+                    // Crear workbook y worksheet
+                    const wb = XLSX.utils.book_new();
+                    const ws = XLSX.utils.json_to_sheet([item]);
+                    
+                    // Añadir worksheet al workbook
+                    XLSX.utils.book_append_sheet(wb, ws, 'Restricción');
+                    
+                    // Exportar el archivo
+                    XLSX.writeFile(wb, `restriccion_${id}.xlsx`);
+                    
+                    this.showNotification(`Restricción ${id} exportada correctamente`);
+                } catch (error) {
+                    console.error('Error al exportar:', error);
+                    this.showNotification('Error al exportar el registro', true);
+                }
+            }
+
+            // Función para obtener un color aleatorio
+            getRandomColor() {
+                const letters = '0123456789ABCDEF';
+                let color = '#';
+                for (let i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+
+            // Función para mostrar notificaciones
+            showNotification(message, isError = false) {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = `notification ${isError ? 'error' : ''}`;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 5000);
+            }
+
+            // Función para generar información legal en el modal
+            generateLegalInfo(item) {
+                return `
+                    <p><strong><i class="fas fa-flag"></i> País:</strong> ${item.pais} (${item.iso})</p>
+                    <p><strong><i class="fas fa-id-card"></i> ID Restricción:</strong> <code>${item.ip_restriccion}</code></p>
+                    <p><strong><i class="fas fa-book"></i> Normativa:</strong> <a href="${item.enlace_norma}" target="_blank" class="text-decoration-none">${item.normativa_aplicable}</a> (${item.normativa_tipo})</p>
+                    <p><strong><i class="fas fa-file-alt"></i> Artículo:</strong> ${item.articulo_norma}</p>
+                    <p><strong><i class="fas fa-calendar-alt"></i> Fecha Norma:</strong> ${item.fecha_norma} (${item.decada_norma})</p>
+                    <p><strong><i class="fas fa-building"></i> Institución Responsable:</strong> ${item.institucion_responsable}</p>
+                    <p><strong><i class="fas fa-map-marker-alt"></i> Nivel/Escala:</strong> ${item.nivel_escala}</p>
+                    ${item.texto_norma ? `<p><strong><i class="fas fa-file-contract"></i> Texto Norma:</strong> ${item.texto_norma}</p>` : ''}
+                    ${item.observaciones_relevantes ? `<p><strong><i class="fas fa-sticky-note"></i> Observaciones Relevantes:</strong> ${item.observaciones_relevantes}</p>` : ''}
+                `;
+            }
+
+            // Función para generar detalles técnicos en el modal
+            generateTechnicalDetails(item) {
+                return `
+                    <p><strong><i class="fas fa-layer-group"></i> Tipo de Restricción:</strong> <span class="badge ${this.getBadgeClass(item.tipo_restriccion)}">${item.tipo_restriccion}</span></p>
+                    <p><strong><i class="fas fa-tag"></i> Tipo Descripción:</strong> ${item.tipo_descrip}</p>
+                    <p><strong><i class="fas fa-check-circle"></i> Cuantificable:</strong> ${item.cuantificable === 'Si' ? 'Sí' : 'No'}</p>
+                    <p><strong><i class="fas fa-ruler"></i> Parámetros Geográficos:</strong> ${item.parametros_geo}</p>
+                    <p><strong><i class="fas fa-draw-polygon"></i> Representación:</strong> ${item.representacion}</p>
+                    <p><strong><i class="fas fa-chart-line"></i> Tipo de Análisis:</strong> ${item.tipo_analisis || "No especificado"}</p>
+                    <p><strong><i class="fas fa-database"></i> ID Dato:</strong> ${item.id_dato || "No especificado"}</p>
+                    <p><strong><i class="fas fa-map"></i> Cartografía Base:</strong> ${item.cartografia_base || "No especificado"}</p>
+                `;
+            }
+
+            // Función para generar información del dataset en el modal
+            generateDatasetInfo(item) {
+                return `
+                    <p><strong><i class="fas fa-database"></i> Dataset:</strong> 
+                        ${item.nombre_del_dataset && item.enlace_dataset ? 
+                            `<a href="${item.enlace_dataset}" target="_blank" class="text-decoration-none">${item.nombre_del_dataset}</a>` : 
+                            (item.nombre_del_dataset || "<span class='text-muted'>No especificado</span>")
+                        }
+                    </p>
+                    <p><strong><i class="fas fa-calendar"></i> Fecha Dataset:</strong> ${item.fecha_dataset ? new Date(item.fecha_dataset).toLocaleDateString() : "No especificado"} (${item.decada_dataset})</p>
+                    <p><strong><i class="fas fa-cogs"></i> Tipo de Dataset:</strong> ${item.tipo_dataset || "<span class='text-muted'>No especificado</span>"}</p>
+                    <p><strong><i class="fas fa-project-diagram"></i> Tipo de Geoproceso:</strong> ${item.tipo_geoproceso || "<span class='text-muted'>No especificado</span>"}</p>
+                    <p><strong><i class="fas fa-code-branch"></i> ID Capa:</strong> ${item.id_layer || "<span class='text-muted'>No especificado</span>"}</p>
+                    <p><strong><i class="fas fa-file-alt"></i> Descripción Dataset:</strong> ${item.descripcion_dataset || "<span class='text-muted'>No especificado</span>"}</p>
+                    <p><strong><i class="fas fa-globe"></i> Cobertura Espacial:</strong> ${item.cobertura_espacial || "<span class='text-muted'>No especificado</span>"}</p>
+                    <p><strong><i class="fas fa-building"></i> Proveedor Dataset:</strong> ${item.proveedor_dataset || "<span class='text-muted'>No especificado</span>"}</p>
+                    <p><strong><i class="fas fa-link"></i> Fuente:</strong> ${item.fuente || "<span class='text-muted'>No especificado</span>"}</p>
+                    <p><strong><i class="fas fa-shield-alt"></i> Licencia:</strong> ${item.licencia_condiciones_de_uso || "<span class='text-muted'>No especificado</span>"}</p>
+                    <p><strong><i class="fas fa-envelope"></i> Contacto Oficial:</strong> ${item.contacto_oficial || "<span class='text-muted'>No especificado</span>"}</p>
+                    ${item.observaciones_dataset ? `<p><strong><i class="fas fa-sticky-note"></i> Observaciones Dataset:</strong> ${item.observaciones_dataset}</p>` : ''}
+                    ${item.entregable ? `<p><strong><i class="fas fa-file"></i> Entregable:</strong> ${item.entregable}</p>` : ''}
+                    ${item.link_entregable ? `<p><strong><i class="fas fa-link"></i> Link Entregable:</strong> <a href="${item.link_entregable}" target="_blank">${item.link_entregable}</a></p>` : ''}
+                `;
+            }
+
+            // Función para generar información adicional en el modal
+            generateAdditionalInfo(item) {
+                let info = '';
+                
+                if (item.analisis_geoespacial && item.analisis_geoespacial !== "") {
+                    info += `<p><strong><i class="fas fa-globe-americas"></i> Análisis Geoespacial:</strong> ${item.analisis_geoespacial}</p>`;
+                }
+                
+                if (item.observaciones && item.observaciones !== "") {
+                    info += `<p><strong><i class="fas fa-sticky-note"></i> Observaciones:</strong> ${item.observaciones}</p>`;
+                }
+                
+                if (item.fuente_informacion && item.fuente_informacion !== "") {
+                    info += `<p><strong><i class="fas fa-font"></i> Fuente Información:</strong> ${item.fuente_informacion}</p>`;
+                }
+                
+                if (item.fecha_actualizacion && item.fecha_actualizacion !== "") {
+                    info += `<p><strong><i class="fas fa-calendar-check"></i> Fecha Actualización:</strong> ${item.fecha_actualizacion}</p>`;
+                }
+                
+                if (item.estado && item.estado !== "") {
+                    info += `<p><strong><i class="fas fa-check-circle"></i> Estado:</strong> ${item.estado}</p>`;
+                }
+                
+                return info || '<p class="text-muted">No hay información adicional disponible.</p>';
+            }
+        }
+
+        // =============================================
+        // INICIALIZACIÓN DE LA APLICACIÓN
+        // =============================================
+
+        const app = new RestrictionsApp();
+
+        $('#exportExcel').click(function() {
+            const wb = XLSX.utils.book_new();
+            const ws_data = [
+                ["País", "ID Restricción", "Normativa", "Descripción", "Tipo", "Pertinencia EUDR", "Dataset", "Geoproceso"]
+            ];
+            
+            filteredData.forEach(row => {
+                ws_data.push([
+                    row.pais,
+                    row.ip_restriccion,
+                    row.normativa_aplicable,
+                    row.descripcion_restriccion,
+                    row.tipo_restriccion,
+                    row.eudr_cat,
+                    row.nombre_del_dataset || "No especificado",
+                    row.geoproceso_a_realizar || "No especificado"
+                ]);
+            });
+            
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            XLSX.utils.book_append_sheet(wb, ws, "Restricciones");
+            XLSX.writeFile(wb, "restricciones_eudr.xlsx");
+        });
+
+        $('#exportExcelAll').click(function() {
+            if (!filteredData || filteredData.length === 0) {
+                alert("No hay datos para exportar");
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+
+            // 1. Obtener todas las propiedades únicas de los objetos
+            const headers = Object.keys(filteredData[0]);
+
+            // 2. Crear ws_data con encabezados
+            const ws_data = [headers];
+
+            // 3. Agregar cada fila con sus valores
+            restrictionsData.forEach(row => {
+                const rowData = headers.map(h => row[h] ?? "No especificado");
+                ws_data.push(rowData);
+            });
+
+            // 4. Generar la hoja y guardar
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            XLSX.utils.book_append_sheet(wb, ws, "Restricciones");
+            XLSX.writeFile(wb, "restricciones_todo.xlsx");
+        });
+
+
+        $('#exportPDF').click(function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(18);
+            doc.text("Reporte de Restricciones Legales - EUDR", 14, 22);
+            doc.setFontSize(11);
+            doc.text(`Generado el: ${new Date().toLocaleDateString()}`, 14, 30);
+            
+            const tableData = [];
+            filteredData.forEach(row => {
+                tableData.push([
+                    row.pais,
+                    row.ip_restriccion,
+                    row.normativa_aplicable.substring(0, 30) + (row.normativa_aplicable.length > 30 ? "..." : ""),
+                    row.descripcion_restriccion.substring(0, 50) + (row.descripcion_restriccion.length > 50 ? "..." : ""),
+                    row.tipo_restriccion,
+                    row.eudr_cat ? "Sí" : "No"
+                ]);
+            });
+            
+            doc.autoTable({
+                head: [['País', 'ID Restricción', 'Normativa', 'Descripción', 'Tipo', 'Pertinencia EUDR']],
+                body: tableData,
+                startY: 40,
+                theme: 'grid',
+                headStyles: { fillColor: [40, 100, 200] }
+            });
+            
+            doc.save('restricciones_eudr.pdf');
+        });
+
+
+    </script>
+</body>
+</html>
