@@ -2033,7 +2033,6 @@
         function formatMessage2(message) {
             if (!message) return '';
             const sanitized = sanitizeInput(message);
-            console.log(sanitized)
             return marked.parse(sanitized, { breaks: true, gfm: true });
         }
 
