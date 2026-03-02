@@ -2195,7 +2195,7 @@
             ];
 
             const requestBody = {
-                model: "glm-4.5-flash",
+                model:  "GLM-4.7-FlashX",   //"GLM-4.7-Flash",
                 messages: mensajes,
                 temperature: 0.7,
                 max_tokens: 3000
@@ -2228,6 +2228,7 @@
                 // Manejo seguro de la respuesta
                 if (dataResp?.choices?.[0]?.message?.content) {
                     const respuestaCompleta = dataResp.choices[0].message.content.trim();
+                    console.log(respuestaCompleta)
 
                     let respuestaPrincipal = "";
                     let preguntasSeguimiento = [];

@@ -25,6 +25,6 @@ const apiKey =   "AIzaSyDExodbczLPp8GSV8OjGvzWd4pQW3I7e9g";
 
 // Alternativa si 2.5 Flash no está disponible
 const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=" + apiKey;
-const API_KEY = "8ba5395226c049bb8ff816496c16859c.8tGkqfsvheCvYom5";
-const API_URL = "https://api.z.ai/api/paas/v4/chat/completions";
+const API_KEY = "f966ed039b67420d97f42a252d680fed.DpzDh6MticS6tLIi";
+const API_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions";
 
